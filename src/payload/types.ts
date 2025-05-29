@@ -10,6 +10,6 @@ export type MessagePayloadOutput = {
 };
 
 export type ModalPayloadOutput = {
-    payload: APIModalInteractionResponseCallbackData;
+    body: APIModalInteractionResponseCallbackData;
     eventHandlers: DJSXEventHandlerMap;
 };
