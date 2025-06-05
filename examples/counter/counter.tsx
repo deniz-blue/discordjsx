@@ -1,4 +1,3 @@
-import "../"
 import React, { useEffect, useState } from "react";
 
 export const Counter = () => {
@@ -6,7 +5,7 @@ export const Counter = () => {
     const [error, setError] = useState(false);
     const [doThrow, setDoThrow] = useState(false);
 
-    if(doThrow) throw new Error("This error should be displayed on discord");
+    if (doThrow) throw new Error("This error should be displayed on discord");
 
     // useEffect(() => {
     //     const i = setInterval(() => {
@@ -14,6 +13,20 @@ export const Counter = () => {
     //     }, 10 * 1000);
     //     return () => clearInterval(i);
     // }, []);
+
+    return (
+        <message v2>
+            <text>
+                Hi!
+            </text>
+
+            <row>
+                <button>
+                    Increment
+                </button>
+            </row>
+        </message>
+    )
 
     return (
         <message v2 ephemeral>
