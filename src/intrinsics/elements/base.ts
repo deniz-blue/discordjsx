@@ -1,3 +1,6 @@
+import type { APIUnfurledMediaItem, BufferResolvable } from "discord.js";
+import type Stream from "node:stream";
+
 export interface BaseInteractableProps {
     customId?: string;
 };

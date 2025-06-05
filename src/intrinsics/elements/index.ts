@@ -1,8 +1,8 @@
-import type { APIMediaGalleryItem, APISelectMenuOption, APIUnfurledMediaItem, ColorResolvable, APIEmbedThumbnail, APIEmbedImage, APIPartialEmoji, GuildMember, User, Snowflake, Channel, ApplicationCommand, Role, TimestampStyles, ApplicationCommandSubCommand, ApplicationCommandSubGroup, BufferResolvable } from "discord.js";
+import type { APISelectMenuOption, ColorResolvable } from "discord.js";
 import type { PropsWithChildren } from "react";
-import type { SelectProps } from "./select.d.ts";
-import type { ButtonProps } from "./button.d.ts";
-import type Stream from "node:stream";
+import type { SelectProps } from "./select.js";
+import type { ButtonProps } from "./button.js";
+import { MediaItemResolvable } from "./base.js";
 
 export interface IntrinsicDiscordElements {
     message: PropsWithChildren<{

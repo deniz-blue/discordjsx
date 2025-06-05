@@ -1,3 +1,6 @@
+import type { APIPartialEmoji, ApplicationCommand, Channel, GuildMember, Role, Snowflake, TimestampStylesString, User } from "discord.js";
+import type { PropsWithChildren } from "react";
+
 export interface IntrinsicMarkdownElements {
     u: PropsWithChildren & React.JSX.IntrinsicAttributes;
     b: PropsWithChildren & React.JSX.IntrinsicAttributes;
@@ -17,7 +20,7 @@ export interface IntrinsicMarkdownElements {
     emoji: APIPartialEmoji & React.JSX.IntrinsicAttributes;
     timestamp: {
         time: Date | number;
-        format?: TimestampStyles;
+        format?: TimestampStylesString;
     } & React.JSX.IntrinsicAttributes;
     mention: ({
         user: User | Snowflake;
