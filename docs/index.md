@@ -13,12 +13,16 @@ hero:
     #   text: API Examples
     #   link: /api-examples
 
-# features:
-#   - title: Feature A
-#     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-#   - title: Feature B
-#     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-#   - title: Feature C
-#     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+features:
+  - icon:
+      src: https://react.dev/favicon.ico
+    title: React-based
+    details: Supports all React features
+  - title: Components V2
+    icon: 🆕
+    details: Supports all new message components
+  - title: Good UX
+    icon: 💬
+    details: We handle edge cases!
 ---
 
