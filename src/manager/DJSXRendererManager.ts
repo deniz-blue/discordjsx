@@ -17,7 +17,7 @@ export class DJSXRendererManager {
             options,
         );
 
-        if (options?.interactible === false) { 
+        if (options?.interactible !== false) { 
             renderer.emitter.on("inactivity", () => {
                 this.renderers.delete(renderer.key!);
             });
