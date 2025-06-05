@@ -12,7 +12,7 @@ You can use all sorts of react features including **state**, **context**, **effe
 
 ## Examples
 
-![Screenshot](./example/screenshot.png)
+![Screenshot](./examples/counter/screenshot.png)
 
 **Code:**
 

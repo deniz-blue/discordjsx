@@ -1,21 +1,8 @@
-# Elements
+# JSX Elements
 
-- [Elements](#elements)
-  - [Root Elements](#root-elements)
-    - [message](#message)
-  - [Layout Elements](#layout-elements)
-    - [container](#container)
-    - [row](#row)
-    - [section](#section)
-  - [Interactive Elements](#interactive-elements)
-    - [button](#button)
-    - [select](#select)
-  - [Content Elements](#content-elements)
-    - [text](#text)
-    - [separator](#separator)
-    - [thumbnail](#thumbnail)
-    - [gallery](#gallery)
-    - [file](#file)
+Here is a list of every JSX element discord-jsx-renderer supports.
+
+[[toc]]
 
 ---
 

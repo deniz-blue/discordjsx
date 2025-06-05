@@ -1,8 +1,7 @@
 import "dotenv/config";
 import { Client, Events } from "discord.js";
-import { DJSXRendererManager } from "../src";
-import { Counter } from "./counter";
-import React from "react";
+import { DJSXRendererManager } from "../../src/index.js";
+import { Counter } from "./counter.js";
 
 const client = new Client({
     intents: [],
