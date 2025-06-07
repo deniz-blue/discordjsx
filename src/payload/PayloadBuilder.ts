@@ -158,7 +158,7 @@ export class PayloadBuilder {
             this.eventHandlers.modalSubmit.set(custom_id, node.props.onSubmit);
 
         return {
-            payload: {
+            body: {
                 title: node.props.title,
                 components: components as any,
                 custom_id,

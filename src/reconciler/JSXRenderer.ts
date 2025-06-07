@@ -1,6 +1,6 @@
 import type { OpaqueRoot } from "react-reconciler";
 import type { HostContainer, InternalNode } from "./types.js";
-import { createNanoEvents } from "nanoevents";
+import { createNanoEvents, type Unsubscribe } from "nanoevents";
 import { ConcurrentRoot } from "react-reconciler/constants.js";
 import { reconciler } from "./reconciler.js";
 
@@ -14,9 +14,9 @@ export type JSXRendererEventMap = {
 
 export class JSXRenderer {
     container: HostContainer;
-    private fiberRoot: OpaqueRoot;
+    private readonly fiberRoot: OpaqueRoot;
 
-    emitter = createNanoEvents<JSXRendererEventMap>();
+    private readonly emitter = createNanoEvents<JSXRendererEventMap>();
 
     constructor() {
         this.container = {
@@ -64,5 +64,9 @@ export class JSXRenderer {
             });
             renderer.setRoot(node);
         });
+    }
+
+    on<K extends keyof JSXRendererEventMap>(event: K, cb: JSXRendererEventMap[K]): Unsubscribe {
+        return this.emitter.on(event, cb);
     }
 };
