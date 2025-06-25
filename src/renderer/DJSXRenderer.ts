@@ -7,7 +7,7 @@ import type { DJSXEventHandlerMap } from "../intrinsics/index.js";
 import { MessageUpdater, REPLY_TIMEOUT, type MessageUpdateable } from "../updater/index.js";
 import { PayloadBuilder } from "../payload/index.js";
 import { resolveFile } from "../utils/resolve.js";
-import { defaultLog } from "src/utils/log.js";
+import { defaultLog } from "../utils/log.js";
 
 export class DJSXRenderer {
     private renderer = new JSXRenderer();
