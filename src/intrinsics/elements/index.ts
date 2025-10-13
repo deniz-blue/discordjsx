@@ -3,6 +3,8 @@ import type { PropsWithChildren } from "react";
 import type { SelectProps } from "./select.js";
 import type { ButtonProps } from "./button.js";
 import { MediaItemResolvable } from "./base.js";
+import { LabelProps } from "./label.js";
+import { TextInputProps } from "./text-input.js";
 
 export interface IntrinsicDiscordElements {
     message: PropsWithChildren<{
@@ -25,30 +27,22 @@ export interface IntrinsicMessageComponents {
     row: PropsWithChildren & React.JSX.IntrinsicAttributes;
     section: PropsWithChildren & React.JSX.IntrinsicAttributes;
     accessory: PropsWithChildren & React.JSX.IntrinsicAttributes;
+    label: PropsWithChildren<LabelProps> & React.JSX.IntrinsicAttributes;
 
     // interactive
     button: PropsWithChildren<ButtonProps> & React.JSX.IntrinsicAttributes;
     select: SelectProps & React.JSX.IntrinsicAttributes;
     option: Omit<APISelectMenuOption, "default"> & React.JSX.IntrinsicAttributes;
 
-    'text-input': {
-        label: string;
-        placeholder?: string;
-        customId?: string;
-        paragraph?: boolean;
-        required?: boolean;
-        min?: number;
-        max?: number;
-        value?: string;
-    } & React.JSX.IntrinsicAttributes;
+    'text-input': TextInputProps & React.JSX.IntrinsicAttributes;
 
     // content
     text: PropsWithChildren & React.JSX.IntrinsicAttributes;
 
     thumbnail: {
+        media: MediaItemResolvable;
         description?: string;
         spoiler?: boolean;
-        media?: MediaItemResolvable;
     } & React.JSX.IntrinsicAttributes;
 
     gallery: PropsWithChildren & React.JSX.IntrinsicAttributes;
@@ -69,4 +63,4 @@ export interface IntrinsicMessageComponents {
     } & React.JSX.IntrinsicAttributes;
 }
 
-export interface DJSXElements extends IntrinsicDiscordElements, IntrinsicMessageComponents {};
+export interface DJSXElements extends IntrinsicDiscordElements, IntrinsicMessageComponents { };
