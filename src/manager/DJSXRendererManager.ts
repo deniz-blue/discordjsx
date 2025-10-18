@@ -2,6 +2,7 @@ import { Collection, type Interaction } from "discord.js";
 import { DJSXRenderer, type DJSXRendererOptions } from "../renderer/index.js";
 import type { ReactNode } from "react";
 import type { MessageUpdateable } from "../updater/types.js";
+import { MessageUpdater } from "../updater/MessageUpdaterOld.js";
 
 export class DJSXRendererManager {
     renderers: Collection<string, DJSXRenderer> = new Collection();
@@ -30,6 +31,13 @@ export class DJSXRendererManager {
     
     add(renderer: DJSXRenderer) {
         this.renderers.set(renderer.key, renderer);
+    }
+
+    _createNew(
+        target: MessageUpdateable,
+        node?: ReactNode,
+    ) {
+        let updater = new MessageUpdater(target, []);
     }
 
     dispatchInteraction(int: Interaction) {

@@ -1,318 +1,166 @@
-import type { APIButtonComponent, APIMessage, APIMessageComponent, APIMessageTopLevelComponent, APIModalComponent, APITextInputComponent, APIUnfurledMediaItem, BufferResolvable } from "discord.js";
-import { ApplicationCommand, blockQuote, bold, ButtonStyle, channelMention, chatInputApplicationCommandMention, codeBlock, ComponentType, formatEmoji, heading, hideLinkEmbed, hyperlink, inlineCode, italic, MessageFlags, resolveColor, roleMention, spoiler, strikethrough, subtext, time, underline, userMention } from "discord.js";
+import type {
+    AnySelectMenuInteraction,
+    APIActionRowComponent,
+    APIButtonComponent,
+    APIComponentInActionRow,
+    APIContainerComponent,
+    APIFileComponent,
+    APILabelComponent,
+    APIMediaGalleryComponent,
+    APIMediaGalleryItem,
+    APIModalInteractionResponseCallbackData,
+    APISectionAccessoryComponent,
+    APISectionComponent,
+    APISelectMenuComponent,
+    APISeparatorComponent,
+    APITextDisplayComponent,
+    APITextInputComponent,
+    APIThumbnailComponent,
+    ButtonInteraction,
+    CacheType,
+    ModalSubmitInteraction,
+    Snowflake,
+} from "discord.js";
+import { ButtonStyle, ComponentType, MessageFlags, resolveColor } from "discord.js";
 import type { InternalNode } from "../reconciler/index.js";
-import { v4 } from "uuid";
-import type { DJSXEventHandlerMap } from "../intrinsics/index.js";
-import type { MessagePayloadOutput, ModalPayloadOutput } from "./types.js";
-import type { DefaultButtonProps, LinkButtonProps, PremiumButtonProps } from "../intrinsics/elements/button.js";
+import type { DJSXEventHandler } from "../intrinsics/index.js";
+import type { LinkButtonProps, PremiumButtonProps } from "../intrinsics/elements/button.js";
 import type { MediaItemResolvable } from "../intrinsics/index.js";
-import type Stream from "node:stream";
 import { resolveEmoji } from "../utils/resolve.js";
 import mime from 'mime-types';
+import { getNodeText } from "./markdown.js";
 
-type InstrinsicNodesMap = {
+type TypedNode = {
     [K in keyof React.JSX.IntrinsicElements]: {
         type: K;
         props: React.JSX.IntrinsicElements[K];
-        children: IntrinsicNode[];
+        children: TypedNode[];
     };
+}[keyof React.JSX.IntrinsicElements];
+
+export type PayloadBuilderHooks = {
+    createCustomId: (providedId?: string) => string;
+    addButtonEventListener: (customId: string, listener: (interaction: ButtonInteraction<CacheType>) => void) => void;
+    addSelectEventListener: (customId: string, listener: DJSXEventHandler<Snowflake[], AnySelectMenuInteraction>) => void;
+    addModalSubmitEventListener: (customId: string, listener: DJSXEventHandler<Record<string, string>, ModalSubmitInteraction>) => void;
+    addAttachment: (name: string, data: any) => void;
+    getBlobFilename: (blob: Blob) => string;
 };
 
-type IntrinsicNode = InstrinsicNodesMap[keyof React.JSX.IntrinsicElements];
-
-const bufferOrStreamNameCache = new WeakMap<Buffer | Stream | Blob, string>();
-
 export class PayloadBuilder {
-    readonly eventHandlers: DJSXEventHandlerMap = {
-        button: new Map(),
-        select: new Map(),
-        modalSubmit: new Map(),
-    };
+    static getMessageFlags(node: InternalNode) {
+        let flags: MessageFlags[] = [];
 
-    readonly attachments = new Map<string, BufferResolvable | Stream | Blob | File>();
-
-    createCustomId = () => `${this.prefixCustomId}:${v4()}`;
-
-    private constructor(
-        private readonly prefixCustomId: string,
-    ) {
-    }
-
-    static createMessage(prefixCustomId: string, defaultFlags: MessageFlags[], node: InternalNode) {
-        return new PayloadBuilder(prefixCustomId).createMessage(node, defaultFlags);
-    }
-
-    static createModal(prefixCustomId: string, node: InternalNode) {
-        return new PayloadBuilder(prefixCustomId).createModal(node);
-    }
-
-    private getText(node: InternalNode, listType?: 'ol' | 'ul'): string {
-        const getChildText = () => {
-            return node.children?.map(e => this.getText(e)).join("") ?? "";
+        if (node.type == "message") {
+            if (node.props.v2) flags.push(MessageFlags.IsComponentsV2);
+            if (node.props.ephemeral) flags.push(MessageFlags.Ephemeral);
         }
 
-        switch (node.type) {
-            case "#text":
-                return node.props.text as string;
-            case "br":
-                return '\n';
-            case "u":
-                return underline(getChildText());
-            case "b":
-                return bold(getChildText());
-            case "i":
-                return italic(getChildText());
-            case "s":
-                return strikethrough(getChildText()); 
-            case "code":
-                return inlineCode(getChildText());
-            case "pre":
-                return codeBlock(node.props.language ?? '', getChildText());
-            case "blockquote":
-                return `\n${blockQuote(getChildText())}\n`;
-            case "emoji":
-                return formatEmoji({
-                    animated: node.props.animated,
-                    id: node.props.id,
-                    name: node.props.name ?? '_',
-                });
-            case "ul":
-                return `${node.children.map(e => this.getText(e, 'ul')).join("\n")}\n`;
-            case "ol":
-                return `${node.children.map(e => this.getText(e, 'ol')).join("\n")}\n`;
-            case "li":
-                return `\n${listType === 'ol' ? '1.' : '- '}${getChildText()}`; 
-            case "h1":
-                return `\n${heading(getChildText(), 1)}\n`;
-            case "h2":
-                return `\n${heading(getChildText(), 2)}\n`;
-            case "h3":
-                return `\n${heading(getChildText(), 3)}\n`;
-            case "subtext":
-                return `\n${subtext(getChildText())}\n`;
-            case "spoiler":
-                return spoiler(getChildText());
-            case "a":
-                const childText = getChildText();
-                if (!childText) return hideLinkEmbed(node.props.href);
-                if (node.props.alt) return hyperlink(childText, node.props.href);
-                return hyperlink(childText, node.props.href, node.props.alt);
-            case "timestamp":
-                return time(node.props.time, node.props.format ?? 'f');
-            case "mention":
-                if (node.props.user) return userMention(node.props.user);
-                if (node.props.member) return `<@!${node.props.member}>`;
-                if (node.props.channel) return channelMention(node.props.channel);
-                if (node.props.role) return roleMention(node.props.role);
-                if (node.props.command) {
-                    const commandId = node.props.command instanceof ApplicationCommand ? node.props.command.id : node.props.command;
-                    if (node.props.subcommandGroupName) {
-                        return chatInputApplicationCommandMention(node.props.commandName, node.props.subcommandGroupName, node.props.subcommandName, commandId);
-                    }
-                    if (node.props.subcommandName) {
-                        return chatInputApplicationCommandMention(node.props.commandName, node.props.subcommandName, commandId);
-                    }
-                    return chatInputApplicationCommandMention(node.props.commandName ?? '_', commandId);
-                }
-                return "";
-            default:
-                return getChildText();
-        }
+        return flags;
     }
 
-    createMessage(node: InternalNode, defaultFlags: MessageFlags[]): MessagePayloadOutput {
-        // wrap in <message> if not the top-level component
-        if (node.type !== "message") {
-            node = {
-                type: "message",
-                props: {
-                    ...(defaultFlags.includes(MessageFlags.IsComponentsV2) ? { v2: true } : {}),
-                    ...(defaultFlags.includes(MessageFlags.Ephemeral) ? { ephemeral: true } : {}),
-                },
-                children: [node],
-            }
-        }
-
-        const flags: MessageFlags[] = [];
-        if (node.props.v2) flags.push(MessageFlags.IsComponentsV2);
-        if (node.props.ephemeral) flags.push(MessageFlags.Ephemeral);
-
-        const components = this.toDiscordComponentsArray(node.children);
-
-        return {
-            flags,
-            options: {
-                components: components as any,
-                content: node.props.v2 ? undefined : this.getText(node),
-            },
-            eventHandlers: this.eventHandlers,
-            attachments: this.attachments,
-        };
-    }
-
-    createModal(node: InternalNode): ModalPayloadOutput {
-        const custom_id = (node.props as React.JSX.IntrinsicElements['modal']).customId || this.createCustomId();
-        const components = this.toDiscordComponentsArray(node.children);
+    static asModal(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if(node.type !== "modal") throw new Error("INVALID_NODE_TYPE");
+        const customId = hooks.createCustomId(node.props.customId);
 
         if (node.props.onSubmit)
-            this.eventHandlers.modalSubmit.set(custom_id, node.props.onSubmit);
+            hooks.addModalSubmitEventListener(customId, node.props.onSubmit);
 
         return {
-            payload: {
-                title: node.props.title,
-                components: components as any,
-                custom_id,
-            },
-            eventHandlers: this.eventHandlers,
-        };
+            title: node.props.title,
+            custom_id: customId,
+            components: node.children.map(child => this.asComponent(child, hooks)),
+        } satisfies APIModalInteractionResponseCallbackData;
     }
 
-    private toDiscordComponentsArray(children: InternalNode[]) {
-        return children.map(this.toDiscordComponent.bind(this))
-            .filter(x => x !== null);
-    }
-
-    private toDiscordComponent(_node: InternalNode): APIMessageComponent | APIModalComponent | null {
-        const node = _node as IntrinsicNode;
-
-        switch (node.type) {
-            case "row":
-                return {
-                    type: ComponentType.ActionRow,
-                    components: this.toDiscordComponentsArray(node.children) as any,
-                };
-            case "button":
-                return this.toDiscordButtonComponent(node);
-            case "select":
-                return this.toDiscordSelectComponent(node);
-            case "text-input":
-                return this.toDiscordTextInputComponent(node);
-            case "section":
-                const nonAccessory = node.children.filter(x => x.type !== "accessory");
-                const accessoryNode = node.children.find(x => x.type === "accessory")?.children[0];
-
-                if (!accessoryNode) return null;
-                const accessory = this.toDiscordComponent(accessoryNode);
-                if (!accessory) return null;
-
-                return {
-                    type: ComponentType.Section,
-                    components: this.toDiscordComponentsArray(nonAccessory) as any,
-                    accessory: accessory as any,
-                };
-            case "text":
-                return {
-                    type: ComponentType.TextDisplay,
-                    content: this.getText(node),
-                };
-            case "thumbnail":
-                if (!node.props.media) return null;
-
-                return {
-                    type: ComponentType.Thumbnail,
-                    media: this.resolveAttachment(node.props.media),
-                    description: node.props.description,
-                    spoiler: node.props.spoiler,
-                };
-            case "gallery":
-                if (!node.children) return null;
-
-                return {
-                    type: ComponentType.MediaGallery,
-                    items: node.children
-                        .filter(child => child.type === 'gallery-item')
-                        .map(child => {
-                            const props = child.props as React.JSX.IntrinsicElements['gallery-item'];
-                            return {
-                                media: this.resolveAttachment(props.media),
-                                description: props.description,
-                                spoiler: props.spoiler,
-                            };
-                        }),
-                };
-            case "file":
-                return {
-                    type: ComponentType.File,
-                    file: this.resolveAttachment(node.props.file), 
-                    spoiler: node.props.spoiler,
-                };
-            case "separator":
-                return {
-                    type: ComponentType.Separator,
-                    divider: node.props.divider,
-                    spacing: node.props.spacing === "lg" ? 2 : 1,
-                };
-            case "container":
-                return {
-                    type: ComponentType.Container,
-                    components: this.toDiscordComponentsArray(node.children) as any,
-                    accent_color: node.props.color ? resolveColor(node.props.color) : undefined,
-                    spoiler: node.props.spoiler,
-                };
-            default:
-                return null;
-        }
-    }
-
-    protected bufferOrStreamOrBlobFileName(stream: Buffer | Stream | Blob) {
-        if (bufferOrStreamNameCache.has(stream)) return bufferOrStreamNameCache.get(stream)!;
-
-        const name = v4();
-        bufferOrStreamNameCache.set(stream, name);
-        return name;
-    }
-
-    resolveAttachment(media: MediaItemResolvable): APIUnfurledMediaItem {
-        if (typeof media === 'string') {
+    static getUnfurledMediaItem(media: MediaItemResolvable, hooks: PayloadBuilderHooks) {
+        if (typeof media === 'string')
             return { url: media };
-        }
 
-        if ('url' in media) {
+        if ('url' in media)
             return media;
-        }
 
         if ('arrayBuffer' in media) {
             if ('name' in media) { // File
-                this.attachments.set(media.name, media);
-                return {
-                    url: `attachment://${media.name}`
-                };
+                hooks.addAttachment(media.name, media);
+                return { url: `attachment://${media.name}` };
             }
 
             if ('type' in media) { // Blob
-                const name = `${this.bufferOrStreamOrBlobFileName(media)}.${mime.extension(media.type)}`;
-                this.attachments.set(name, media);
-                return {
-                    url: `attachment://${name}`
-                };
+                const name = `${hooks.getBlobFilename(media)}.${mime.extension(media.type)}`;
+                hooks.addAttachment(name, media);
+                return { url: `attachment://${name}` };
             }
         }
-    
-        this.attachments.set(media.name, media.attachment);
+
+        hooks.addAttachment(media.name, media.attachment);
         return { url: `attachment://${media.name}` };
     }
 
-    private asAPIMessageTopLevelComponent(node: InternalNode): APIMessageTopLevelComponent {
-        const c = this.toDiscordComponent(node);
-        if(!c) throw new Error();
-
-        if(
-            c.type === ComponentType.StringSelect
-            || c.type === ComponentType.UserSelect
-            || c.type === ComponentType.RoleSelect
-            || c.type === ComponentType.MentionableSelect
-            || c.type === ComponentType.ChannelSelect
-            || c.type === ComponentType.Button
-            || c.type === ComponentType.Thumbnail
-            || c.type === ComponentType.TextInput
-        ) {
-            throw new Error();
+    static asComponent(node: TypedNode, hooks: PayloadBuilderHooks): any {
+        switch (node.type) {
+            case "row":
+                return this.asActionRow(node, hooks);
+            case "button":
+                return this.asButton(node, hooks);
+            case "select":
+                return this.asSelect(node, hooks);
+            case "text-input":
+                return this.asTextInput(node, hooks);
+            case "section":
+                return this.asSection(node, hooks);
+            case "text":
+                return this.asTextInput(node, hooks);
+            case "thumbnail":
+                return this.asThumbnail(node, hooks);
+            case "gallery":
+                return this.asMediaGallery(node, hooks);
+            case "gallery-item":
+                return this.asMediaGalleryItem(node, hooks);
+            case "file":
+                return this.asFile(node, hooks);
+            case "separator":
+                return this.asSeparator(node, hooks);
+            case "container":
+                return this.asContainer(node, hooks);
+            case "label":
+                return this.asLabel(node, hooks);
+            default:
+                throw new Error("NOT_A_COMPONENT");
         }
-
-        return c as APIMessageTopLevelComponent;
     }
 
-    private toDiscordButtonComponent(node: InstrinsicNodesMap["button"]): APIButtonComponent {
+    static asActionRow<T extends APIComponentInActionRow>(node: TypedNode, hooks: PayloadBuilderHooks) {
+        return {
+            type: ComponentType.ActionRow,
+            components: node.children
+                .map(child => this.asComponent(child, hooks))
+                .filter(Boolean),
+        } satisfies APIActionRowComponent<T>;
+    }
+
+    static asTextInput(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "text-input") throw new Error("INVALID_NODE_TYPE");
+        const customId = hooks.createCustomId(node.props.customId);
+        return {
+            type: ComponentType.TextInput,
+            custom_id: customId,
+            style: node.props.paragraph ? 2 : 1,
+            max_length: node.props.max,
+            min_length: node.props.min,
+            value: node.props.value,
+            required: node.props.required,
+            placeholder: node.props.placeholder,
+        } satisfies APITextInputComponent;
+    }
+
+    static asButton(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "button") throw new Error("INVALID_NODE_TYPE");
+
+        const customId = hooks.createCustomId(node.props.customId);
+        if ("onClick" in node.props && node.props.onClick)
+            hooks.addButtonEventListener(customId, node.props.onClick);
+
         const style = "skuId" in node.props ? ButtonStyle.Premium : (
             "url" in node.props ? ButtonStyle.Link : ({
                 "primary": ButtonStyle.Primary,
@@ -322,47 +170,49 @@ export class PayloadBuilder {
             }[node.props.style || "primary"])
         );
 
-        const custom_id = !("skuId" in node.props || "url" in node.props) ? (node.props.customId || this.createCustomId()) : undefined;
-        if (custom_id && (node.props as DefaultButtonProps).onClick) this.eventHandlers.button.set(custom_id, (node.props as DefaultButtonProps).onClick as any);
-
         return {
             type: ComponentType.Button,
-            style: style as any,
-            label: this.getText(node),
-            custom_id,
+            custom_id: customId,
+            label: getNodeText(node),
+            style,
             sku_id: (node.props as PremiumButtonProps).skuId,
             url: (node.props as LinkButtonProps).url,
             disabled: node.props.disabled,
             emoji: node.props.emoji ? resolveEmoji(node.props.emoji) : undefined,
-        };
+        } satisfies APIButtonComponent;
     }
 
-    private toDiscordSelectComponent(node: InstrinsicNodesMap["select"]): any {
-        const custom_id = node.props.customId || this.createCustomId();
-        if ((node.props as any).onSelect)
-            this.eventHandlers.select.set(custom_id, (node.props as any).onSelect);
+    static asSelect(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "select") throw new Error("INVALID_NODE_TYPE");
+
+        const customId = hooks.createCustomId(node.props.customId);
+        if ("onSelect" in node.props && node.props.onSelect)
+            hooks.addSelectEventListener(customId, node.props.onSelect as any); // TODO: types
 
         return {
             type: {
-                string: ComponentType.StringSelect,
-                user: ComponentType.UserSelect,
-                role: ComponentType.RoleSelect,
-                mentionable: ComponentType.MentionableSelect,
-                channel: ComponentType.ChannelSelect,
+                string: ComponentType.StringSelect as const,
+                user: ComponentType.UserSelect as const,
+                role: ComponentType.RoleSelect as const,
+                mentionable: ComponentType.MentionableSelect as const,
+                channel: ComponentType.ChannelSelect as const,
             }[node.props.type],
-            custom_id,
+            custom_id: customId,
             min_values: node.props.min,
             max_values: node.props.max,
             disabled: node.props.disabled,
             placeholder: node.props.placeholder,
             ...(node.props.type === "string" ? {
-                options: node.children.map(child => ({
-                    label: (child as InstrinsicNodesMap["option"]).props.label,
-                    value: (child as InstrinsicNodesMap["option"]).props.value,
-                    description: (child as InstrinsicNodesMap["option"]).props.description,
-                    emoji: (child as InstrinsicNodesMap["option"]).props.emoji,
-                    default: (node.props.defaultValues as string[] | undefined)?.includes((child as InstrinsicNodesMap["option"]).props.value),
-                })),
+                options: node.children.map((child) => {
+                    if (child.type !== "option") throw new Error("INVALID_NODE_TYPE");
+                    return {
+                        label: child.props.label,
+                        value: child.props.value,
+                        description: child.props.description,
+                        emoji: child.props.emoji,
+                        default: (node.props.defaultValues)?.some(x => (typeof x == "string" ? x : x.id) == child.props.value),
+                    };
+                }),
             } : {}),
             ...(node.props.type === "user" || node.props.type === "role" ? {
                 default_values: node.props.defaultValues?.map(id => ({ id, type: node.props.type })) as any,
@@ -374,20 +224,115 @@ export class PayloadBuilder {
                 channel_types: node.props.channelTypes,
                 default_values: node.props.defaultValues?.map(id => ({ id, type: "channel" })) as any,
             } : {}),
-        };
+        } as APISelectMenuComponent;
     }
 
-    private toDiscordTextInputComponent(node: InstrinsicNodesMap["text-input"]): APITextInputComponent {
+    static asSection(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "select") throw new Error("INVALID_NODE_TYPE");
+        const nonAccessory = node.children.filter(x => x.type !== "accessory");
+
+        const accessoryNode = node.children.find(x => x.type === "accessory")?.children[0];
+        if (!accessoryNode) throw new Error("ACCESSORY_MISSING");
+
+        const accessory = this.asSectionAccessory(accessoryNode, hooks);
+
         return {
-            type: ComponentType.TextInput,
-            custom_id: node.props.customId || this.createCustomId(),
-            style: node.props.paragraph ? 2 : 1,
+            type: ComponentType.Section,
+            components: nonAccessory.map(child => this.asComponent(child, hooks)).filter(Boolean),
+            accessory,
+        } satisfies APISectionComponent;
+    }
+
+    static asSectionAccessory(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "button" && node.type !== "thumbnail")
+            throw new Error("INVALID_ACCESSORY");
+        return this.asComponent(node, hooks) as APISectionAccessoryComponent;
+    }
+
+    static asTextDisplay(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "text") throw new Error("INVALID_NODE_TYPE");
+
+        return {
+            type: ComponentType.TextDisplay,
+            content: getNodeText(node),
+        } satisfies APITextDisplayComponent;
+    }
+
+    static asThumbnail(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "thumbnail") throw new Error("INVALID_NODE_TYPE");
+
+        return {
+            type: ComponentType.Thumbnail,
+            media: this.getUnfurledMediaItem(node.props.media, hooks),
+            description: node.props.description,
+            spoiler: node.props.spoiler,
+        } satisfies APIThumbnailComponent;
+    }
+
+    static asMediaGallery(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "gallery") throw new Error("INVALID_NODE_TYPE");
+
+        return {
+            type: ComponentType.MediaGallery,
+            items: node.children.map(child => this.asMediaGalleryItem(child, hooks)),
+        } satisfies APIMediaGalleryComponent;
+    }
+
+    static asMediaGalleryItem(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "gallery-item") throw new Error("INVALID_NODE_TYPE");
+
+        return {
+            media: this.getUnfurledMediaItem(node.props.media, hooks),
+            description: node.props.description,
+            spoiler: node.props.spoiler,
+        } satisfies APIMediaGalleryItem;
+    }
+
+    static asFile(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "file") throw new Error("INVALID_NODE_TYPE");
+
+        return {
+            type: ComponentType.File,
+            spoiler: node.props.spoiler,
+            file: this.getUnfurledMediaItem(node.props.file, hooks),
+        } satisfies APIFileComponent;
+    }
+
+    static asSeparator(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "separator") throw new Error("INVALID_NODE_TYPE");
+
+        return {
+            type: ComponentType.Separator,
+            divider: node.props.divider,
+            spacing: typeof node.props.spacing == "number" ? node.props.spacing : ({
+                sm: 1,
+                lg: 2,
+                "": undefined,
+            }[node.props.spacing ?? ""]),
+        } satisfies APISeparatorComponent;
+    }
+
+
+    static asContainer(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "container") throw new Error("INVALID_NODE_TYPE");
+
+        return {
+            type: ComponentType.Container,
+            components: node.children.map(child => this.asComponent(child, hooks)),
+            accent_color: (node.props.color !== undefined) ? resolveColor(node.props.color) : undefined,
+            spoiler: node.props.spoiler,
+        } satisfies APIContainerComponent;
+    }
+
+
+    static asLabel(node: TypedNode, hooks: PayloadBuilderHooks) {
+        if (node.type !== "label") throw new Error("INVALID_NODE_TYPE");
+
+        return {
+            type: ComponentType.Label,
+            component: this.asComponent(node.children[0], hooks),
             label: node.props.label,
-            required: node.props.required,
-            placeholder: node.props.placeholder,
-            value: node.props.value,
-            min_length: node.props.min,
-            max_length: node.props.max,
-        };
+            description: node.props.description,
+        } satisfies APILabelComponent;
     }
 };
