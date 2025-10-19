@@ -8,7 +8,7 @@ import { createNanoEvents } from "nanoevents";
 const DEBUG = !!process.env.DISCORDJSX_DEBUG;
 
 export interface MessageUpdaterOptions {
-
+    replyLatency?: number;
 };
 
 export interface MessageUpdaterEventMap {
@@ -39,12 +39,13 @@ export class MessageUpdater {
 
         // TODO: what if target changes before noResponseTimer fires the callback?
         const replyMaxTime = getTargetMaxResponseTime(target);
-        if (replyMaxTime) this.noResponseTimer.resetWithDelay(replyMaxTime);
+        if (replyMaxTime) this.noResponseTimer.resetWithDelay(replyMaxTime - (this.options?.replyLatency ?? 2000));
     }
 
     // Deferring when too slow to render
     private noResponseTimer = new Timer(this.onNoResponse.bind(this));
     private onNoResponse() {
+        console.debug("onNoResponse called");
         // deferTarget() does the check for !deferred && !replied
         this.updateMutex.runInMutex(async () => {
             await deferTarget(this.target);
@@ -70,6 +71,7 @@ export class MessageUpdater {
         if (DEBUG) console.log(JSON.stringify({ category: "djsx/updater", payload }));
         try {
             const newTarget = await updateTarget(this.target, payload);
+            this.noResponseTimer.stop();
             if (newTarget) this.setTarget(newTarget);
         } catch (e) {
             if (e instanceof DiscordAPIError && e.code == 10062) {

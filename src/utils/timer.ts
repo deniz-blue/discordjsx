@@ -32,8 +32,14 @@ export class Timer {
         return this;
     }
 
+    stop() {
+        this.disabled = true;
+        this._setup();
+        return this;
+    }
+
     reset() {
-        this.ended = false;
+        this.disabled = false;
         this._setup();
         return this;
     }

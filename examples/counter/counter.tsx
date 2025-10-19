@@ -7,26 +7,12 @@ export const Counter = () => {
 
     if (doThrow) throw new Error("This error should be displayed on discord");
 
-    useEffect(() => {
-        const i = setInterval(() => {
-            setCount(c => c+1);
-        }, 10 * 1000);
-        return () => clearInterval(i);
-    }, []);
-
-    return (
-        <message ephemeral>
-            <text>
-                Hi! Counter is {count}
-            </text>
-
-            <row>
-                <button>
-                    Increment
-                </button>
-            </row>
-        </message>
-    )
+    // useEffect(() => {
+    //     const i = setInterval(() => {
+    //         setCount(c => c+1);
+    //     }, 10 * 1000);
+    //     return () => clearInterval(i);
+    // }, []);
 
     return (
         <message v2 ephemeral>
@@ -43,28 +29,30 @@ export const Counter = () => {
                     <button
                         style="danger"
                         onClick={() => setCount(c => c - 1)}
+                        customId="dcr"
                     >
                         -1
                     </button>
                     <button
                         style="success"
                         onClick={() => setCount(c => c + 1)}
+                        customId="incr"
                     >
                         +1
                     </button>
                 </row>
                 <row>
-                    <button style="secondary">
+                    <button style="secondary" customId="nil">
                         No Event Handler
                     </button>
                 </row>
                 <row>
-                    <button style="danger" onClick={() => setError(true)}>
+                    <button style="danger" onClick={() => setError(true)} customId="invalid">
                         Make payload invalid
                     </button>
                 </row>
                 <row>
-                    <button style="danger" onClick={() => setDoThrow(true)}>
+                    <button style="danger" onClick={() => setDoThrow(true)} customId="throw">
                         Make component throw
                     </button>
                 </row>

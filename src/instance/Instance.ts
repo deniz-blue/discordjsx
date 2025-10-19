@@ -37,14 +37,6 @@ export class Instance {
             },
 
             ...this.hooks,
-            // // TODO
-            // addButtonEventListener: () => { },
-            // addModalSubmitEventListener: () => { },
-            // addSelectEventListener: () => { },
-
-            // // TODO
-            // createCustomId: () => "",
-            // getBlobFilename: () => "",
         };
 
         const components = node.children.map(child =>
@@ -59,9 +51,9 @@ export class Instance {
         });
     }
 
-    private onRootError = (error: Error) => {
+    private onRootError = (error: Error, info: React.ErrorInfo) => {
         const createPayload = createErrorPayload;
-        const payload = createPayload(error);
+        const payload = createPayload(error, info);
         this.updater.update(payload);
         // if this fails, onUpdateError will be called :3
         // no need for error catching here
