@@ -8,7 +8,8 @@ import { TextInputProps } from "./text-input.js";
 
 export interface IntrinsicDiscordElements {
     message: PropsWithChildren<{
-        v2?: boolean;
+        v1?: boolean;
+        v2?: boolean; // Deprecated
         ephemeral?: boolean;
     }> & React.JSX.IntrinsicAttributes;
     modal: PropsWithChildren<{

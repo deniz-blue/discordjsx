@@ -5,10 +5,13 @@ import { PayloadBuilder, PayloadBuilderHooks } from "../payload/PayloadBuilder.j
 import { resolveFile } from "../utils/resolve.js";
 import { createErrorPayload } from "../utils/error.js";
 
+export interface InstanceHooks extends Omit<PayloadBuilderHooks, "addAttachment"> {};
+
 export class Instance {
     root: Root;
     constructor(
-        public updater: MessageUpdater,
+        public readonly updater: MessageUpdater,
+        public readonly hooks: InstanceHooks,
     ) {
         this.root = createRoot();
         this.root.on("render", this.onRootRender);
@@ -17,7 +20,7 @@ export class Instance {
         this.updater.on("expire", this.onTargetExpired);
     }
 
-    private async onRootRender(node: InternalNode | null) {
+    private onRootRender = async (node: InternalNode | null) => {
         // TODO: render empty message maybe?
         if (!node) return;
 
@@ -33,14 +36,15 @@ export class Instance {
                 })));
             },
 
-            // TODO
-            addButtonEventListener: () => { },
-            addModalSubmitEventListener: () => { },
-            addSelectEventListener: () => { },
+            ...this.hooks,
+            // // TODO
+            // addButtonEventListener: () => { },
+            // addModalSubmitEventListener: () => { },
+            // addSelectEventListener: () => { },
 
-            // TODO
-            createCustomId: () => "",
-            getBlobFilename: () => "",
+            // // TODO
+            // createCustomId: () => "",
+            // getBlobFilename: () => "",
         };
 
         const components = node.children.map(child =>
@@ -55,7 +59,7 @@ export class Instance {
         });
     }
 
-    private onRootError(error: Error) {
+    private onRootError = (error: Error) => {
         const createPayload = createErrorPayload;
         const payload = createPayload(error);
         this.updater.update(payload);
@@ -63,12 +67,12 @@ export class Instance {
         // no need for error catching here
     }
 
-    private onUpdateError(error: Error) {
+    private onUpdateError = (error: Error) => {
         // TODO: custom logging
         console.error(error);
     }
 
-    private onTargetExpired() {
+    private onTargetExpired = () => {
         // TODO: disabling components maybe?
     }
 }

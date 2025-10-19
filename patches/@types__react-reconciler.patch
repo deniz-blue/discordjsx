@@ -1,0 +1,12 @@
+diff --git a/index.d.ts b/index.d.ts
+index 9123efaec383c1758cf0c3158c0fd380776c2cf7..78f809ef7b6dc6dbd518fd2c2aae304b7f863b75 100644
+--- a/index.d.ts
++++ b/index.d.ts
+@@ -380,7 +380,6 @@ declare namespace ReactReconciler {
+             type: Type,
+             oldProps: Props,
+             newProps: Props,
+-            internalInstanceHandle: OpaqueHandle,
+             keepChildren: boolean,
+             recyclableInstance: null | Instance,
+         ): Instance;

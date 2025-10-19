@@ -5,6 +5,8 @@ import { debounceAsync } from "../utils/debounceAsync.js";
 import { Timer } from "../utils/timer.js";
 import { createNanoEvents } from "nanoevents";
 
+const DEBUG = !!process.env.DISCORDJSX_DEBUG;
+
 export interface MessageUpdaterOptions {
 
 };
@@ -41,15 +43,17 @@ export class MessageUpdater {
     }
 
     // Deferring when too slow to render
-    private noResponseTimer = new Timer(this.onNoResponse);
+    private noResponseTimer = new Timer(this.onNoResponse.bind(this));
     private onNoResponse() {
         // deferTarget() does the check for !deferred && !replied
-        deferTarget(this.target);
+        this.updateMutex.runInMutex(async () => {
+            await deferTarget(this.target);
+        });
     }
 
     // Expiry
 
-    private expiryTimer = new Timer(this.onExpire);
+    private expiryTimer = new Timer(this.onExpire.bind(this));
     private onExpire() {
         this.emitter.emit("expire");
     }
@@ -63,12 +67,17 @@ export class MessageUpdater {
     update = debounceAsync(this.updateImmediate, 300, this.updateMutex);
     async updateImmediate(payload: MessageUpdateData) {
         if (this.isExpired()) return;
+        if (DEBUG) console.log(JSON.stringify({ category: "djsx/updater", payload }));
         try {
             const newTarget = await updateTarget(this.target, payload);
             if (newTarget) this.setTarget(newTarget);
         } catch (e) {
             if (e instanceof DiscordAPIError && e.code == 10062) {
                 this.expiryTimer.end();
+            }
+
+            if(DEBUG && e instanceof DiscordAPIError) {
+                console.log(JSON.stringify({ category: "djsx/updater", rawError: e.rawError }));
             }
 
             const error = e instanceof Error ? e : new Error(String(e));

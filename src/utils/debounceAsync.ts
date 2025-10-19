@@ -14,22 +14,39 @@ import Mutex from "./mutex.js";
  */
 export function debounceAsync<F extends (this: This, ...args: Args) => PromiseLike<void>, This, Args extends any[]>(fn: F, ms = 300, mutex = new Mutex()): F {
     let timeoutId: NodeJS.Timeout;
-    let next: [This, Args] | undefined;
+    let next: [This, Args, Error] | undefined;
+
+    async function execute(thisArg: This, args: Args, stack: Error) {
+        // v8 engine seems to be good at garbage collecting unresolvable promises?
+        await new Promise(resolve => {
+            timeoutId = setTimeout(resolve, ms);
+        });
+
+        await mutex.runInMutex(fn, thisArg, args, stack);
+
+        if(next) {
+            void execute(...next);
+            next = undefined;
+        }
+    }
 
     return function (this: This, ...args: Args) {
+        const stack = new Error("debounceAsync stack");
+
         if (mutex.isLocked) {
-            next = [this, args];
+            next = [this, args, stack];
             return;
         }
 
         clearTimeout(timeoutId);
-        timeoutId = setTimeout(async function execute(thisArg: This, args: Args) {
-            await mutex.runInMutex(fn, thisArg, args);
+        void execute(this, args, stack);
+        // timeoutId = setTimeout(async function execute(thisArg: This, args: Args, stack: Error) {
+        //     await mutex.runInMutex(fn, thisArg, args, stack);
 
-            if (next) {
-                timeoutId = setTimeout(execute, ms, ...next);
-                next = undefined;
-            }
-        }, ms, this, args);
+        //     if (next) {
+        //         timeoutId = setTimeout(execute, ms, ...next);
+        //         next = undefined;
+        //     }
+        // }, ms, this, args, callSiteError);
     } as F;
 }

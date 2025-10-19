@@ -151,11 +151,11 @@ export const InternalHostConfig = logmixin<
     scheduleMicrotask: queueMicrotask,
 
     // Persistence
-    cloneInstance(instance, type, oldProps, newProps, handle, keepChildren, recyclableInstance) {
+    cloneInstance(instance, type, oldProps, newProps, keepChildren, recyclableInstance) {
         return {
             type: type,
-            props: newProps,
-            children: keepChildren ? instance.children : (recyclableInstance?.children ?? []),
+            props: { ...instance.props },
+            children: keepChildren ? [...instance.children] : [...(recyclableInstance?.children ?? [])],
             hidden: instance.hidden,
         };
     },
@@ -194,7 +194,7 @@ function logmixin<T>(obj: T): T {
         if (typeof obj[key] === 'function') {
             const orig = obj[key];
             obj[key] = function (this: T, ...args: any[]) {
-                console.log(`[HostConfig] ${key}`, ...args);
+                console.log(({ category: "djsx/host", fn: key, args }));
                 return orig.apply(this, args);
             } as any;
         }

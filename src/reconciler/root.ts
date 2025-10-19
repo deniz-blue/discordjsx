@@ -5,7 +5,7 @@ import { reconciler } from "./reconciler.js";
 
 export interface RootEventMap {
     render: (node: InternalNode | null) => void;
-    error: (error: Error) => void;
+    error: (error: Error, info: React.ErrorInfo) => void;
 };
 
 export interface Root {
@@ -32,7 +32,10 @@ export const createRoot = (): Root => {
         false,
         null,
         "discord-jsx-renderer",
-        (e: Error) => emitter.emit("error", e),
+        (e, info) => emitter.emit("error", e, info),
+        (e, info) => emitter.emit("error", e, info),
+        (e, info) => emitter.emit("error", e, info),
+        ()=>{},
         null
     );
 

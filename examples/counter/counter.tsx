@@ -7,17 +7,17 @@ export const Counter = () => {
 
     if (doThrow) throw new Error("This error should be displayed on discord");
 
-    // useEffect(() => {
-    //     const i = setInterval(() => {
-    //         setCount(c => c+1);
-    //     }, 10 * 1000);
-    //     return () => clearInterval(i);
-    // }, []);
+    useEffect(() => {
+        const i = setInterval(() => {
+            setCount(c => c+1);
+        }, 10 * 1000);
+        return () => clearInterval(i);
+    }, []);
 
     return (
-        <message v2>
+        <message ephemeral>
             <text>
-                Hi!
+                Hi! Counter is {count}
             </text>
 
             <row>

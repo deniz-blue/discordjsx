@@ -54,7 +54,7 @@ export class PayloadBuilder {
         let flags: MessageFlags[] = [];
 
         if (node.type == "message") {
-            if (node.props.v2) flags.push(MessageFlags.IsComponentsV2);
+            if (!node.props.v1) flags.push(MessageFlags.IsComponentsV2);
             if (node.props.ephemeral) flags.push(MessageFlags.Ephemeral);
         }
 
@@ -111,7 +111,7 @@ export class PayloadBuilder {
                 return this.asTextInput(node, hooks);
             case "section":
                 return this.asSection(node, hooks);
-            case "text":
+            case "text-input":
                 return this.asTextInput(node, hooks);
             case "thumbnail":
                 return this.asThumbnail(node, hooks);
@@ -127,6 +127,8 @@ export class PayloadBuilder {
                 return this.asContainer(node, hooks);
             case "label":
                 return this.asLabel(node, hooks);
+            case "text":
+                return this.asTextDisplay(node, hooks);
             default:
                 throw new Error("NOT_A_COMPONENT");
         }
