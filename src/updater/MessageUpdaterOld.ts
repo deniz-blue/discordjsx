@@ -16,7 +16,7 @@ export type InteractionMessageUpdaterEventMap = {
     messageUpdated(method: "reply" | "editReply" | "update"): void;
 };
 
-export class MessageUpdater {
+export class MessageUpdater_old {
     tokenExpired = false;
     timedOut = false;
     emitter = createNanoEvents<InteractionMessageUpdaterEventMap>();
@@ -100,7 +100,7 @@ export class MessageUpdater {
     }
 
     private readonly updateTargetMutex = new Mutex();
-    updateMessage = debounceAsync(async (...args: Parameters<MessageUpdater['_updateMessage']>) => {
+    updateMessage = debounceAsync(async (...args: Parameters<MessageUpdater_old['_updateMessage']>) => {
         return await this._updateMessage(...args);
     }, 300, this.updateTargetMutex);
 

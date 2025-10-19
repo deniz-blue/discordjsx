@@ -3,13 +3,20 @@ import { MessageUpdateable, MessagePayload, updateTarget, getTargetMaxResponseTi
 import Mutex from "../utils/mutex.js";
 import { debounceAsync } from "../utils/debounceAsync.js";
 import { Timer } from "../utils/timer.js";
+import { createNanoEvents } from "nanoevents";
 
 export interface MessageUpdaterOptions {
 
 };
 
+export interface MessageUpdaterEventMap {
+    expire: () => void;
+    error: (e: Error) => void;
+};
+
 export class MessageUpdater {
     private target!: MessageUpdateable;
+    emitter = createNanoEvents<MessageUpdaterEventMap>();
     constructor(
         target: MessageUpdateable,
         readonly options?: MessageUpdaterOptions,
@@ -39,7 +46,7 @@ export class MessageUpdater {
 
     private expiryTimer = new Timer(this.onExpire);
     private onExpire() {
-        // do stuff
+        this.emitter.emit("expire");
     }
     isExpired() {
         return this.expiryTimer.ended;
@@ -50,17 +57,17 @@ export class MessageUpdater {
     private updateMutex = new Mutex();
     update = debounceAsync(this.updateImmediate, 300, this.updateMutex);
     async updateImmediate(payload: BaseMessageOptions) {
+        if (this.isExpired()) return;
         try {
             const newTarget = await updateTarget(this.target, payload);
             if (newTarget) this.setTarget(newTarget);
-        } catch(e) {
-            if(e instanceof DiscordAPIError && e.code == 10062) {
+        } catch (e) {
+            if (e instanceof DiscordAPIError && e.code == 10062) {
                 this.expiryTimer.end();
             }
+
+            const error = e instanceof Error ? e : new Error(String(e));
+            this.emitter.emit("error", error);
         }
     }
-
-    // Error handling
-
-    // TODO
 };
