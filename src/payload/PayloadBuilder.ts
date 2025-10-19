@@ -16,6 +16,7 @@ import type {
     APITextDisplayComponent,
     APITextInputComponent,
     APIThumbnailComponent,
+    BufferResolvable,
     ButtonInteraction,
     CacheType,
     ModalSubmitInteraction,
@@ -26,6 +27,7 @@ import type { InternalNode } from "../reconciler/index.js";
 import type { DJSXEventHandler } from "../intrinsics/index.js";
 import type { LinkButtonProps, PremiumButtonProps } from "../intrinsics/elements/button.js";
 import type { MediaItemResolvable } from "../intrinsics/index.js";
+import type Stream from "node:stream";
 import { resolveEmoji } from "../utils/resolve.js";
 import mime from 'mime-types';
 import { getNodeText } from "./markdown.js";
@@ -43,7 +45,7 @@ export type PayloadBuilderHooks = {
     addButtonEventListener: (customId: string, listener: (interaction: ButtonInteraction<CacheType>) => void) => void;
     addSelectEventListener: (customId: string, listener: DJSXEventHandler<Snowflake[], AnySelectMenuInteraction>) => void;
     addModalSubmitEventListener: (customId: string, listener: DJSXEventHandler<Record<string, string>, ModalSubmitInteraction>) => void;
-    addAttachment: (name: string, data: any) => void;
+    addAttachment: (name: string, data: File | Blob | BufferResolvable | Stream) => void;
     getBlobFilename: (blob: Blob) => string;
 };
 

@@ -1,18 +1,18 @@
 import { Collection, type Interaction } from "discord.js";
-import { DJSXRenderer, type DJSXRendererOptions } from "../renderer/index.js";
+import { DJSXRenderer_old, type DJSXRendererOptions } from "../instance/index.js";
 import type { ReactNode } from "react";
 import type { MessageUpdateable } from "../updater/types.js";
-import { MessageUpdater } from "../updater/MessageUpdaterOld.js";
+import { MessageUpdater_old } from "../updater/MessageUpdaterOld.js";
 
 export class DJSXRendererManager {
-    renderers: Collection<string, DJSXRenderer> = new Collection();
+    renderers: Collection<string, DJSXRenderer_old> = new Collection();
 
     create(
         interaction: MessageUpdateable,
         node?: ReactNode,
         options?: DJSXRendererOptions,
     ) {
-        const renderer = new DJSXRenderer(
+        const renderer = new DJSXRenderer_old(
             interaction,
             node,
             options,
@@ -29,7 +29,7 @@ export class DJSXRendererManager {
         return renderer;
     }
     
-    add(renderer: DJSXRenderer) {
+    add(renderer: DJSXRenderer_old) {
         this.renderers.set(renderer.key, renderer);
     }
 
@@ -37,7 +37,7 @@ export class DJSXRendererManager {
         target: MessageUpdateable,
         node?: ReactNode,
     ) {
-        let updater = new MessageUpdater(target, []);
+        let updater = new MessageUpdater_old(target, []);
     }
 
     dispatchInteraction(int: Interaction) {

@@ -42,19 +42,19 @@ export const deferTarget = async (target: MessageUpdateable) => {
     }
 }
 
-export type MessagePayload = BaseMessageOptions & {
+export type MessageUpdateData = BaseMessageOptions & {
     flags?: MessageFlags[];
 };
 
 /**
- * Updates a {@link MessageUpdateable} with a {@link MessagePayload} and returns a new target if it changes
+ * Updates a {@link MessageUpdateable} with a {@link MessageUpdateData} and returns a new target if it changes
  * @param target Target to update
  * @param payload Message payload
  * @returns The new target if it changed, null if the target stayed the same
  */
 export const updateTarget = async (
     target: MessageUpdateable,
-    payload: MessagePayload,
+    payload: MessageUpdateData,
 ): Promise<MessageUpdateable | null> => {
     const flags = payload.flags ?? [];
 

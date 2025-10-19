@@ -1,5 +1,5 @@
 import type { HostContainer, InternalNode } from "./types.js";
-import { createNanoEvents } from "nanoevents";
+import { createNanoEvents, Unsubscribe } from "nanoevents";
 import { ConcurrentRoot } from "react-reconciler/constants.js";
 import { reconciler } from "./reconciler.js";
 
@@ -8,7 +8,14 @@ export interface RootEventMap {
     error: (error: Error) => void;
 };
 
-export const createRoot = () => {
+export interface Root {
+    on: <E extends keyof RootEventMap>(event: E, callback: RootEventMap[E]) => Unsubscribe;
+    readonly node: InternalNode | null;
+    setElement: (element: React.ReactNode) => void;
+    unmount: () => void;
+};
+
+export const createRoot = (): Root => {
     const emitter = createNanoEvents<RootEventMap>();
     let node: InternalNode | null = null;
     const onRender = (rendered: InternalNode | null) => {
@@ -41,9 +48,7 @@ export const createRoot = () => {
     };
 
     return {
-        on<E extends keyof RootEventMap>(event: E, callback: RootEventMap[E]) {
-            return emitter.on(event, callback);
-        },
+        on: emitter.on.bind(emitter),
         setElement,
         unmount: () => setElement(null),
         get node() {

@@ -1,5 +1,5 @@
 import { BaseMessageOptions, DiscordAPIError } from "discord.js";
-import { MessageUpdateable, MessagePayload, updateTarget, getTargetMaxResponseTime, getTargetExpiration, deferTarget } from "./update-target.js";
+import { MessageUpdateable, MessageUpdateData, updateTarget, getTargetMaxResponseTime, getTargetExpiration, deferTarget } from "./update-target.js";
 import Mutex from "../utils/mutex.js";
 import { debounceAsync } from "../utils/debounceAsync.js";
 import { Timer } from "../utils/timer.js";
@@ -16,7 +16,12 @@ export interface MessageUpdaterEventMap {
 
 export class MessageUpdater {
     private target!: MessageUpdateable;
-    emitter = createNanoEvents<MessageUpdaterEventMap>();
+
+    // Events
+    private emitter = createNanoEvents<MessageUpdaterEventMap>();
+    on = <E extends keyof MessageUpdaterEventMap>(event: E, callback: MessageUpdaterEventMap[E]) =>
+        this.emitter.on(event, callback);
+
     constructor(
         target: MessageUpdateable,
         readonly options?: MessageUpdaterOptions,
@@ -56,7 +61,7 @@ export class MessageUpdater {
 
     private updateMutex = new Mutex();
     update = debounceAsync(this.updateImmediate, 300, this.updateMutex);
-    async updateImmediate(payload: BaseMessageOptions) {
+    async updateImmediate(payload: MessageUpdateData) {
         if (this.isExpired()) return;
         try {
             const newTarget = await updateTarget(this.target, payload);
