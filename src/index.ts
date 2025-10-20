@@ -1,4 +1,4 @@
-export * from "./intrinsics/index.js";
+/// <reference path="./types/index.d.ts" />
 
 export * from "./core/DiscordJSX.js";
 export * from "./utils/index.js";

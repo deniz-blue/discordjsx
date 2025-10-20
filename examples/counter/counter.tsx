@@ -17,7 +17,7 @@ export const Counter = () => {
 
 
     return (
-        <message v2 ephemeral>
+        <message ephemeral>
             {error && (
                 <button>
                     error
