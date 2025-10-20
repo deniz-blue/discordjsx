@@ -2,8 +2,8 @@
 
 [![Discord](https://img.shields.io/discord/1197520507617153064?logo=discord)](https://deniz.blue/discord-invite?id=1197520507617153064)
 [![Static Badge](https://img.shields.io/badge/view_on-github-blue?logo=github)](https://github.com/deniz-blue/discordjsx)
-![NPM Version](https://img.shields.io/npm/v/discord-jsx-renderer)
-![NPM Last Update](https://img.shields.io/npm/last-update/discord-jsx-renderer)
+[![NPM Version](https://img.shields.io/npm/v/discord-jsx-renderer)](https://www.npmjs.com/package/discord-jsx-renderer)
+[![NPM Last Update](https://img.shields.io/npm/last-update/discord-jsx-renderer)](https://www.npmjs.com/package/discord-jsx-renderer)
 ![GitHub Repo stars](https://img.shields.io/github/stars/deniz-blue/discordjsx)
 
 Render react components for Discord interactions (Components V2 supported!)
