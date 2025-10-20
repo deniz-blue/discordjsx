@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { Client, Events } from "discord.js";
-import { DiscordJSX } from "../../src/index.js";
+import { djsx } from "../../src/index.js";
 import { Counter } from "./counter.js";
 
 const client = new Client({
@@ -11,11 +11,28 @@ client.on(Events.ClientReady, (readyClient) => {
     console.log(`Logged in as ${readyClient.user.tag} !`);
 });
 
-const djsx = new DiscordJSX();
-
 client.on(Events.InteractionCreate, (interaction) => {
     if(interaction.isChatInputCommand()) {
-        djsx.createMessage(interaction, <Counter />);
+        if(interaction.commandName == "test") {
+            djsx.createMessage(interaction, <Counter />);
+        } else if(interaction.commandName == "modal") {
+            djsx.createModal(interaction, (
+                <modal
+                    title="Meow meow meow"
+                    onSubmit={(...x: any[]) => {
+                        console.log(x)
+                        console.log("MODAL SUBMITTED !!!!");
+                    }}
+                >
+                    <label label="Answer to everything">
+                        <text-input
+                            placeholder="42"
+                            customId="meow"
+                        />
+                    </label>
+                </modal>
+            ));
+        }
     } else {
         djsx.dispatchInteraction(interaction);
     }

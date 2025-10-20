@@ -7,7 +7,9 @@
         "module": "NodeNext",
         "moduleResolution": "nodenext",
         "jsx": "react-jsx",
-        "lib": ["ESNext"],
+        "lib": [
+            "ESNext"
+        ],
         "strict": true,
         "noEmit": true
     }

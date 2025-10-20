@@ -1,6 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useInstance } from "../../src/core/context.js";
+import { djsx } from "../../src/index.js";
+import { ModalSubmitInteraction } from "discord.js";
+
+// @jsxRuntime automatic
 
 export const Counter = () => {
+    const { instanceId } = useInstance();
+
     const [count, setCount] = useState(0);
     const [error, setError] = useState(false);
     const [doThrow, setDoThrow] = useState(false);
@@ -24,6 +31,8 @@ export const Counter = () => {
             <container>
                 <text>
                     Counter: **{count}**
+                    <br/>
+                    Instance ID: **{instanceId}**
                 </text>
                 <row>
                     <button
@@ -45,15 +54,29 @@ export const Counter = () => {
                     <button style="secondary" customId="nil">
                         No Event Handler
                     </button>
-                </row>
-                <row>
+                    
+                    <button style="danger" onClick={() => setDoThrow(true)} customId="throw">
+                        Make component throw
+                    </button>
                     <button style="danger" onClick={() => setError(true)} customId="invalid">
                         Make payload invalid
                     </button>
                 </row>
                 <row>
-                    <button style="danger" onClick={() => setDoThrow(true)} customId="throw">
-                        Make component throw
+                    <button style="primary" onClick={(int) => {
+                        djsx.createModal(int, (
+                            <modal title="Add custom amount" onSubmit={(int: ModalSubmitInteraction) => {
+                                setCount(500);
+                            }}>
+                                <label label="Amount">
+                                    <text-input
+                                        customId="amount"
+                                    />
+                                </label>
+                            </modal>
+                        ), instanceId);
+                    }}>
+                        Open modal
                     </button>
                 </row>
             </container>

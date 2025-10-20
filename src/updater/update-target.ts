@@ -23,7 +23,7 @@ export const getTargetExpiration = (target: MessageUpdateable): number | null =>
     return null;
 };
 
-export const getTargetMaxResponseTime = (target: MessageUpdateable) => {
+export const getTargetResponseDeadline = (target: MessageUpdateable) => {
     if (target instanceof BaseInteraction) {
         if (!target.replied && !target.deferred) return INTERACTION_REPLY_EXPIRY;
     }

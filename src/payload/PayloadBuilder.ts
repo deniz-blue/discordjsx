@@ -40,11 +40,14 @@ type TypedNode = {
     };
 }[keyof React.JSX.IntrinsicElements];
 
-export type PayloadBuilderHooks = {
-    createCustomId: (providedId?: string) => string;
+export interface InteractionEventHooks {
     addButtonEventListener: (customId: string, listener: (interaction: ButtonInteraction<CacheType>) => void) => void;
     addSelectEventListener: (customId: string, listener: DJSXEventHandler<Snowflake[], AnySelectMenuInteraction>) => void;
     addModalSubmitEventListener: (customId: string, listener: DJSXEventHandler<Record<string, string>, ModalSubmitInteraction>) => void;
+};
+
+export interface PayloadBuilderHooks extends InteractionEventHooks {
+    createCustomId: (providedId?: string) => string;
     addAttachment: (name: string, data: File | Blob | BufferResolvable | Stream) => void;
     getBlobFilename: (blob: Blob) => string;
 };

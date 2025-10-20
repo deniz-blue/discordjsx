@@ -1,5 +1,5 @@
 import { BaseMessageOptions, DiscordAPIError } from "discord.js";
-import { MessageUpdateable, MessageUpdateData, updateTarget, getTargetMaxResponseTime, getTargetExpiration, deferTarget } from "./update-target.js";
+import { MessageUpdateable, MessageUpdateData, updateTarget, getTargetResponseDeadline, getTargetExpiration, deferTarget } from "./update-target.js";
 import Mutex from "../utils/mutex.js";
 import { debounceAsync } from "../utils/debounceAsync.js";
 import { Timer } from "../utils/timer.js";
@@ -38,7 +38,7 @@ export class MessageUpdater {
         if (expirationTime) this.expiryTimer.resetWithDelay(expirationTime);
 
         // TODO: what if target changes before noResponseTimer fires the callback?
-        const replyMaxTime = getTargetMaxResponseTime(target);
+        const replyMaxTime = getTargetResponseDeadline(target);
         if (replyMaxTime) this.noResponseTimer.resetWithDelay(replyMaxTime - (this.options?.replyLatency ?? 2000));
     }
 

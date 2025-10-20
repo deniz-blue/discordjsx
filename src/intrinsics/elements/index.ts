@@ -1,10 +1,11 @@
-import type { APISelectMenuOption, ColorResolvable } from "discord.js";
+import type { APISelectMenuOption, ColorResolvable, ModalSubmitInteraction } from "discord.js";
 import type { PropsWithChildren } from "react";
 import type { SelectProps } from "./select.js";
 import type { ButtonProps } from "./button.js";
 import { MediaItemResolvable } from "./base.js";
 import { LabelProps } from "./label.js";
 import { TextInputProps } from "./text-input.js";
+import { DJSXEventHandler } from "../events.js";
 
 export interface IntrinsicDiscordElements {
     message: PropsWithChildren<{
@@ -15,7 +16,7 @@ export interface IntrinsicDiscordElements {
     modal: PropsWithChildren<{
         title: string;
         customId?: string;
-        onSubmit?: () => void;
+        onSubmit?: DJSXEventHandler<any, ModalSubmitInteraction>;
     }> & React.JSX.IntrinsicAttributes;
 }
 
