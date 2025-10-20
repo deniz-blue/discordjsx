@@ -44,9 +44,7 @@ export const createRoot = (): Root => {
             element,
             opaqueRoot,
             null,
-            () => {
-                console.log("Callback!")
-            },
+            null,
         );
     };
 

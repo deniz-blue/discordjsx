@@ -63,11 +63,14 @@ export class DiscordJSX {
         const props: WrapperProps = {
             context: {
                 instanceId,
+                instance,
             },
         };
 
         const wrappedElement = createElement(Wrapper, props, element);
         instance.root.setElement(wrappedElement);
+
+        return instanceId;
     }
 
     async createModal(
@@ -87,14 +90,16 @@ export class DiscordJSX {
         const payload = PayloadBuilder.asModal(node as any, hooks);
 
         await target.showModal(payload);
+
+        return instanceId;
     }
 
     dispatchInteraction(int: Interaction) {
         if (int.isMessageComponent() || int.isModalSubmit()) {
-            this.listeners.get(int.customId)?.(int);
-
             const instanceId = this.instanceCustomIds.findKey(ids => ids.has(int.customId));
             if (instanceId) this.instances.get(instanceId)?.updater.setTarget(int);
+
+            this.listeners.get(int.customId)?.(int);
         }
     }
 

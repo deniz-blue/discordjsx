@@ -83,7 +83,6 @@ export const InternalHostConfig = logmixin<
         node.props = props;
     },
     commitTextUpdate(node, oldText, newText) {
-        // console.log("commitTextUpdate", [node, oldText, newText])
         node.props.text = newText;
     },
 

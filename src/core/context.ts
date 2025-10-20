@@ -1,7 +1,9 @@
 import { createContext, useContext } from "react";
+import { Instance } from "../internals.js";
 
 export interface InstanceContext {
     instanceId: string;
+    instance: Instance;
 };
 
 export const InstanceContext = createContext<InstanceContext | null>(null);

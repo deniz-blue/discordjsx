@@ -7,7 +7,7 @@
             "request": "launch",
             "cwd": "${workspaceFolder}/examples/counter",
             "runtimeExecutable": "pnpm",
-            "args": ["dlx", "tsx", "watch", "index"],
+            "args": ["dlx", "tsx", "index"],
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
             "skipFiles": [

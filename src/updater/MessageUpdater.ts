@@ -14,10 +14,12 @@ export interface MessageUpdaterOptions {
 export interface MessageUpdaterEventMap {
     expire: () => void;
     error: (e: Error, isReport?: boolean) => void;
+    targetChange: (target: MessageUpdateable) => void;
 };
 
 export class MessageUpdater {
     private target!: MessageUpdateable;
+    getTarget = () => this.target;
 
     // Events
     private emitter = createNanoEvents<MessageUpdaterEventMap>();
@@ -33,19 +35,20 @@ export class MessageUpdater {
 
     setTarget(target: MessageUpdateable) {
         this.target = target;
+        this.emitter.emit("targetChange", target);
 
         const expirationTime = getTargetExpiration(target);
         if (expirationTime) this.expiryTimer.resetWithDelay(expirationTime);
 
         // TODO: what if target changes before noResponseTimer fires the callback?
-        const replyMaxTime = getTargetResponseDeadline(target);
-        if (replyMaxTime) this.noResponseTimer.resetWithDelay(replyMaxTime - (this.options?.replyLatency ?? 2000));
+        const deadline = getTargetResponseDeadline(target);
+        if (deadline) this.noResponseTimer.resetWithDelay(deadline - (this.options?.replyLatency ?? 2000));
     }
 
     // Deferring when too slow to render
     private noResponseTimer = new Timer(this.onNoResponse.bind(this));
     private onNoResponse() {
-        console.debug("onNoResponse called");
+        if (DEBUG) console.debug("Did not update in time, will attempt to defer", this.target);
         // deferTarget() does the check for !deferred && !replied
         this.updateMutex.runInMutex(async () => {
             await deferTarget(this.target);

@@ -16,7 +16,6 @@ export default class Mutex {
             try {
                 await fn.apply(thisArg as T, args as A);
             } catch (e) {
-                console.log("DEBUG_REMOVEME", e)
                 if (e instanceof Error && stack) e.stack += "\n" + stack.stack;
                 throw e;
             } finally {

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useInstance } from "../../src/core/context.js";
-import { djsx } from "../../src/index.js";
+import { djsx, useModal } from "../../src/index.js";
 import { ModalSubmitInteraction } from "discord.js";
 
 // @jsxRuntime automatic
 
 export const Counter = () => {
     const { instanceId } = useInstance();
+    const openModal = useModal();
 
     const [count, setCount] = useState(0);
     const [error, setError] = useState(false);
@@ -14,12 +15,6 @@ export const Counter = () => {
 
     if (doThrow) throw new Error("This error should be displayed on discord");
 
-    // useEffect(() => {
-    //     const i = setInterval(() => {
-    //         setCount(c => c+1);
-    //     }, 10 * 1000);
-    //     return () => clearInterval(i);
-    // }, []);
 
     return (
         <message v2 ephemeral>
@@ -31,7 +26,7 @@ export const Counter = () => {
             <container>
                 <text>
                     Counter: **{count}**
-                    <br/>
+                    <br />
                     Instance ID: **{instanceId}**
                 </text>
                 <row>
@@ -54,7 +49,7 @@ export const Counter = () => {
                     <button style="secondary" customId="nil">
                         No Event Handler
                     </button>
-                    
+
                     <button style="danger" onClick={() => setDoThrow(true)} customId="throw">
                         Make component throw
                     </button>
@@ -63,8 +58,8 @@ export const Counter = () => {
                     </button>
                 </row>
                 <row>
-                    <button style="primary" onClick={(int) => {
-                        djsx.createModal(int, (
+                    <button style="primary" onClick={() => {
+                        openModal(
                             <modal title="Add custom amount" onSubmit={(int: ModalSubmitInteraction) => {
                                 setCount(500);
                             }}>
@@ -74,7 +69,7 @@ export const Counter = () => {
                                     />
                                 </label>
                             </modal>
-                        ), instanceId);
+                        );
                     }}>
                         Open modal
                     </button>
