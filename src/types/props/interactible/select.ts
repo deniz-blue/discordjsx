@@ -3,6 +3,7 @@ import type { PropsWithChildren } from "react";
 import { EventHandler } from "../../events.js";
 
 export interface BaseSelectProps {
+    customId?: string;
     min?: number;
     max?: number;
     disabled?: boolean;

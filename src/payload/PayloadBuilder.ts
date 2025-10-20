@@ -24,13 +24,12 @@ import type {
 } from "discord.js";
 import { ButtonStyle, ComponentType, MessageFlags, resolveColor } from "discord.js";
 import type { InternalNode } from "../reconciler/index.js";
-import type { DJSXEventHandler } from "../intrinsics/index.js";
-import type { LinkButtonProps, PremiumButtonProps } from "../intrinsics/elements/button.js";
-import type { MediaItemResolvable } from "../intrinsics/index.js";
 import type Stream from "node:stream";
 import { resolveEmoji } from "../utils/resolve.js";
 import mime from 'mime-types';
 import { getNodeText } from "./markdown.js";
+import { EventHandler } from "../types/events.js";
+import { MediaItemResolvable } from "../types/media.js";
 
 type TypedNode = {
     [K in keyof React.JSX.IntrinsicElements]: {
@@ -41,9 +40,9 @@ type TypedNode = {
 }[keyof React.JSX.IntrinsicElements];
 
 export interface InteractionEventHooks {
-    addButtonEventListener: (customId: string, listener: (interaction: ButtonInteraction<CacheType>) => void) => void;
-    addSelectEventListener: (customId: string, listener: DJSXEventHandler<Snowflake[], AnySelectMenuInteraction>) => void;
-    addModalSubmitEventListener: (customId: string, listener: DJSXEventHandler<Record<string, string>, ModalSubmitInteraction>) => void;
+    addButtonEventListener: (customId: string, listener: EventHandler<ButtonInteraction, void>) => void;
+    addSelectEventListener: (customId: string, listener: EventHandler<AnySelectMenuInteraction, any>) => void;
+    addModalSubmitEventListener: (customId: string, listener: EventHandler<ModalSubmitInteraction, any>) => void;
 };
 
 export interface PayloadBuilderHooks extends InteractionEventHooks {
@@ -182,11 +181,11 @@ export class PayloadBuilder {
             custom_id: customId,
             label: getNodeText(node),
             style,
-            sku_id: (node.props as PremiumButtonProps).skuId,
-            url: (node.props as LinkButtonProps).url,
+            sku_id: node.props.skuId,
+            url: node.props.url!,
             disabled: node.props.disabled,
             emoji: node.props.emoji ? resolveEmoji(node.props.emoji) : undefined,
-        } satisfies APIButtonComponent;
+        } as unknown as APIButtonComponent;
     }
 
     static asSelect(node: TypedNode, hooks: PayloadBuilderHooks) {

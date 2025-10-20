@@ -1,8 +1,6 @@
 import { APIMessageComponent, AttachmentPayload, blockQuote, codeBlock, ComponentType, DiscordAPIError, inlineCode, MessageFlags, resolveColor } from "discord.js";
 import { MessageUpdateData } from "../updater/update-target.js";
-import PACKAGE_JSON from "../../package.json" with { type: "json" };
-
-const VERSION = PACKAGE_JSON.version;
+import { VERSION } from "../version.js";
 
 const prettifyStack = (stack: string) => {
     return stack.split("\n").map(

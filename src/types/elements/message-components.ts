@@ -7,6 +7,7 @@ import { ThumbnailProps } from "../props/content/thumbnail.js";
 import { GalleryItemProps } from "../props/content/gallery-item.js";
 import { FileProps } from "../props/content/file.js";
 import { SeparatorProps } from "../props/content/separator.js";
+import { PropsWithChildren } from "react";
 
 export interface IntrinsicMessageComponents {
     // layout

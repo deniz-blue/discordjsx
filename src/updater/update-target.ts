@@ -1,5 +1,4 @@
 import { BaseChannel, BaseInteraction, BaseMessageOptions, ButtonInteraction, ChannelSelectMenuInteraction, ChatInputCommandInteraction, MentionableSelectMenuInteraction, Message, MessageFlags, ModalSubmitInteraction, RoleSelectMenuInteraction, SendableChannels, StringSelectMenuInteraction, TextBasedChannel, User, UserSelectMenuInteraction } from "discord.js";
-import { pickMessageFlags } from "./utils.js";
 
 export const INTERACTION_TOKEN_EXPIRY = 15 * 60 * 1000;
 export const INTERACTION_REPLY_EXPIRY = 3 * 1000;
@@ -118,3 +117,11 @@ export const updateTarget = async (
     // target unchanged
     return null;
 };
+
+export const pickMessageFlags = <
+    T extends number,
+    Allowed extends readonly T[],
+>(flags: T[], allowedFlags: Allowed): Allowed[number][] => {
+    return flags.filter((flag): flag is Allowed[number] => allowedFlags.includes(flag));
+};
+

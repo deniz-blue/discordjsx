@@ -1,5 +1,6 @@
 import { PropsWithChildren } from "react";
 import { EventHandler } from "../events.js";
+import { ModalSubmitInteraction } from "discord.js";
 
 export interface MessageProps extends PropsWithChildren {
     v1?: boolean;

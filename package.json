@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "node -p \"'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
     "build": "tsc",
     "publish:lib": "npm run build && npm publish",
     "publish:beta": "npm run build && npm publish --tag beta",

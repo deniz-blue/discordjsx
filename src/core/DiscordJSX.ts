@@ -1,12 +1,11 @@
 import { Collection, CommandInteraction, MessageComponentInteraction, Snowflake, SnowflakeUtil, type Interaction } from "discord.js";
-import type { MessageUpdateable } from "../updater/types.js";
 import { Instance, InstanceHooks } from "../instance/Instance.js";
 import { MessageUpdater } from "../updater/MessageUpdater.js";
-import { createNanoEvents } from "nanoevents";
 import { InteractionEventHooks, PayloadBuilder, PayloadBuilderHooks } from "../payload/PayloadBuilder.js";
 import { renderOnce } from "../reconciler/root.js";
 import { createElement } from "react";
 import { Wrapper, WrapperProps } from "./wrapper.js";
+import { MessageUpdateable } from "../updater/update-target.js";
 
 export type ModalTarget =
     | CommandInteraction

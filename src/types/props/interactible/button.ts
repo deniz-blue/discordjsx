@@ -1,7 +1,6 @@
 import type { APIMessageComponentEmoji, ButtonInteraction, EmojiResolvable } from "discord.js";
-import { DJSXEventHandler } from "../events.js";
-import { EventHandler } from "../../events.js";
 import { PropsWithChildren } from "react";
+import { EventHandler } from "../../events.js";
 
 export type ButtonStyle =
     | "primary"
