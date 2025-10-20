@@ -51,7 +51,7 @@ export const InternalHostConfig = logmixin<
     >
 >({
     // Properties
-    isPrimaryRenderer: false,
+    isPrimaryRenderer: true,
     warnsIfNotActing: false,
     supportsMutation: false,
     supportsPersistence: true,

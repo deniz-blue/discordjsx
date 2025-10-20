@@ -5,7 +5,7 @@ import { PayloadBuilder, PayloadBuilderHooks } from "../payload/PayloadBuilder.j
 import { resolveFile } from "../utils/resolve.js";
 import { createErrorPayload } from "../utils/error.js";
 
-export interface InstanceHooks extends Omit<PayloadBuilderHooks, "addAttachment"> {};
+export interface InstanceHooks extends Omit<PayloadBuilderHooks, "addAttachment"> { };
 
 export class Instance {
     root: Root;
@@ -51,16 +51,25 @@ export class Instance {
         });
     }
 
-    private onRootError = (error: Error, info: React.ErrorInfo) => {
+    // Error Handling
+
+    private reportError(error: Error, info?: React.ErrorInfo) {
+        console.error(error, info);
         const createPayload = createErrorPayload;
         const payload = createPayload(error, info);
-        this.updater.update(payload);
-        // if this fails, onUpdateError will be called :3
-        // no need for error catching here
+        this.updater.update(payload, true);
     }
 
-    private onUpdateError = (error: Error) => {
-        // TODO: custom logging
+    private onRootError = (error: Error, info: React.ErrorInfo) => {
+        this.reportError(error, info);
+    }
+
+    private onUpdateError = (error: Error, isReport?: boolean) => {
+        if (!isReport) {
+            return this.reportError(error);
+        }
+
+        console.error("Error while reporting an error....");
         console.error(error);
     }
 

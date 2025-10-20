@@ -13,7 +13,7 @@ export interface MessageUpdaterOptions {
 
 export interface MessageUpdaterEventMap {
     expire: () => void;
-    error: (e: Error) => void;
+    error: (e: Error, isReport?: boolean) => void;
 };
 
 export class MessageUpdater {
@@ -66,7 +66,7 @@ export class MessageUpdater {
 
     private updateMutex = new Mutex();
     update = debounceAsync(this.updateImmediate, 300, this.updateMutex);
-    async updateImmediate(payload: MessageUpdateData) {
+    async updateImmediate(payload: MessageUpdateData, isReport?: boolean) {
         if (this.isExpired()) return;
         if (DEBUG) console.log(JSON.stringify({ category: "djsx/updater", payload }));
         try {
@@ -78,12 +78,12 @@ export class MessageUpdater {
                 this.expiryTimer.end();
             }
 
-            if(DEBUG && e instanceof DiscordAPIError) {
+            if (DEBUG && e instanceof DiscordAPIError) {
                 console.log(JSON.stringify({ category: "djsx/updater", rawError: e.rawError }));
             }
 
             const error = e instanceof Error ? e : new Error(String(e));
-            this.emitter.emit("error", error);
+            this.emitter.emit("error", error, isReport);
         }
     }
 };
