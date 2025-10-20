@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "tsx",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/examples/counter",
+            "runtimeExecutable": "pnpm",
+            "args": ["dlx", "tsx", "index"],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": [
+                "<node_internals>/**",
+            ],
+        }
+    ],
+}

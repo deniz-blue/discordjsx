@@ -7,8 +7,9 @@
         "module": "NodeNext",
         "moduleResolution": "nodenext",
         "jsx": "react-jsx",
-        "lib": ["ESNext"],
-        "baseUrl": ".",
+        "lib": [
+            "ESNext"
+        ],
         "esModuleInterop": true,
         "declaration": true,
         "resolveJsonModule": true,

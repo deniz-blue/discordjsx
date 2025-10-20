@@ -1,9 +1,9 @@
 import type { APISelectMenuOption, ChannelSelectMenuInteraction, ChannelType, MentionableSelectMenuInteraction, RoleSelectMenuInteraction, Snowflake, StringSelectMenuInteraction, UserSelectMenuInteraction } from "discord.js";
-import type { BaseInteractableProps } from "./base.js";
-import type { DJSXEventHandler } from "../events.js";
 import type { PropsWithChildren } from "react";
+import { EventHandler } from "../../events.js";
 
-export interface BaseSelectProps extends BaseInteractableProps {
+export interface BaseSelectProps {
+    customId?: string;
     min?: number;
     max?: number;
     disabled?: boolean;
@@ -13,32 +13,34 @@ export interface BaseSelectProps extends BaseInteractableProps {
 export interface StringSelectProps extends BaseSelectProps, PropsWithChildren {
     type: "string";
     defaultValues?: Snowflake[];
-    onSelect?: DJSXEventHandler<Snowflake[], StringSelectMenuInteraction>;
+    onSelect?: EventHandler<StringSelectMenuInteraction, Snowflake[]>;
 }
 
 export interface UserSelectProps extends BaseSelectProps {
     type: "user";
     defaultValues?: Snowflake[];
-    onSelect?: DJSXEventHandler<Snowflake[], UserSelectMenuInteraction>;
+    onSelect?: EventHandler<UserSelectMenuInteraction, Snowflake[]>;
 };
 
 export interface RoleSelectProps extends BaseSelectProps {
     type: "role";
     defaultValues?: Snowflake[];
-    onSelect?: DJSXEventHandler<Snowflake[], RoleSelectMenuInteraction>;
+    onSelect?: EventHandler<RoleSelectMenuInteraction, Snowflake[]>;
 };
 
 export interface MentionableSelectProps extends BaseSelectProps {
     type: "mentionable";
     defaultValues?: { id: Snowflake; type: "user" | "role" }[];
-    onSelect?: DJSXEventHandler<Snowflake[], MentionableSelectMenuInteraction>;
+    onSelect?: EventHandler<MentionableSelectMenuInteraction, Snowflake[]>;
 };
 
 export interface ChannelSelectProps extends BaseSelectProps {
     type: "channel";
     channelTypes?: ChannelType[];
     defaultValues?: Snowflake[];
-    onSelect?: DJSXEventHandler<Snowflake[], ChannelSelectMenuInteraction>;
+    onSelect?: EventHandler<ChannelSelectMenuInteraction, Snowflake[]>;
 };
 
 export type SelectProps = StringSelectProps | UserSelectProps | RoleSelectProps | MentionableSelectProps | ChannelSelectProps;
+
+export type OptionProps = Omit<APISelectMenuOption, "default">;

@@ -1,7 +1,7 @@
-export * from "./intrinsics/index.js";
-export * from "./manager/index.js";
-export * from "./payload/index.js";
-export * from "./reconciler/index.js";
-export * from "./renderer/index.js";
-export * from "./updater/index.js";
-export * from "./utils/index.js";
+export * from "./types/index.js"
+
+export * from "./core/DiscordJSX.js";
+export * from "./core/hooks/useModal.js";
+
+export * from "./utils/markComponentsDisabled.js";
+export * from "./utils/resolve.js";
