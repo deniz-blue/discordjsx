@@ -14,25 +14,36 @@ export default defineConfig({
 
 		sidebar: [
 			{
-				text: 'Examples',
+				text: 'Getting Started',
+				base: "guide",
 				items: [
-					{ text: 'Getting Started', link: '/getting-started' },
-					{ text: "Rendering JSX", link: '/rendering' },
+					{ text: 'Installation', link: '/installation' },
+					{ text: 'TypeScript', link: '/typescript' },
+					{ text: "Rendering Elements", link: '/rendering' },
+					{ text: "Event Handlers", link: '/event-handlers' },
 				]
 			},
 			{
+				text: 'Guide',
 				base: "guide",
-				text: "Guide",
 				items: [
 					{ text: "Rendering a Message", link: '/message' },
 					{ text: "Counter", link: '/counter' },
-				],
+				]
+			},
+			{
+				text: 'Features',
+				base: "features",
+				items: [
+					{ text: "Error Handling", link: '/error-handling' },
+					{ text: "Auto-defer", link: '/auto-defer' },
+				]
 			},
 			{
 				base: "reference",
 				text: "Reference",
 				items: [
-					{ text: "JSX Elements", link: "/elements" }
+					{ text: "All Elements", link: "/elements" }
 				],
 			},
 		],

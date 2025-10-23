@@ -1,24 +1,80 @@
-# Rendering JSX
+# Rendering Elements
 
-To render some JSX or React components, use the `DJSXRenderer#create(target, element)` method.
-
-`target` can be any of the following:
-- Any [Interaction](https://discord.js.org/docs/packages/discord.js/14.19.3/Interaction:TypeAlias) except [AutocompleteInteraction](https://discord.js.org/docs/packages/discord.js/14.19.3/AutocompleteInteraction:Class)
-  - If interaction has a message (in case of message component interactions) it will be updated.
-  - If interaction does not have a message, discord-jsx-renderer will reply.
-- [Message](https://discord.js.org/docs/packages/discord.js/14.19.3/Message:Class)
-- [TextBasedChannel](https://discord.js.org/docs/packages/discord.js/14.19.3/TextBasedChannel:TypeAlias) or [User](https://discord.js.org/docs/packages/discord.js/14.19.3/User:Class)
-  - Will send a message and keep updating it.
-
-`element` is any JSX element.
+To render JSX elements as Discord messages, use `djsx.createMessage(interaction, element)`:
 
 ```tsx
-djsx.create(interaction, (
-	<message>
+djsx.createMessage(interaction, (
+	<message ephemeral>
 		Hello {interaction.user}!
+		<br/>
+		<br/>
+		This message was sent with <pre>discord-jsx-renderer</pre>
 	</message>
 ))
 ```
+
+## Rendering Components
+
+To render custom components, write JSX like you would in React:
+
+```tsx
+const MyFunctionComponent = () => {
+	// ...
+	return (
+		<message ephemeral>
+			<text>
+				Hi! :3
+			</text>
+		</message>
+	);
+};
+
+djsx.createMessage(interaction, (
+	<MyFunctionComponent />
+))
+```
+
+## Using State and Hooks
+
+You can use state and any React hook in your components:
+
+```tsx
+export const Timer = ({ timeout = 5000 }: { timeout: number }) => {
+	const [expired, setExpired] = useState(false);
+
+	useEffect(() => {
+		const timeoutId = setTimeout(() => {
+			setExpired(true);
+		}, timeout);
+
+		return () => clearTimeout(timeoutId);
+	}, []);
+
+	return (
+		<text>
+			Timer {expired ? "has expired!" : "is running..."}
+		</text>
+	)
+};
+```
+
+Contexts also work out of the box.
+
+
+
+
+
+
+:::
+
+:::
+
+:::
+
+
+
+
+
 
 ## React Features
 
@@ -30,7 +86,7 @@ Your component can also re-render on its own (due to, for example, a `setInterva
 
 When your JSX elements or components throw an error or you use discord message components incorrectly, discord-jsx-renderer will show an error message:
 
-![](./_media/error-1.png)
+![](../_media/error-1.png)
 
 <!-- TODO: custom error handling tutorial -->
 
