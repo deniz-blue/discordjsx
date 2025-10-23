@@ -1,6 +1,6 @@
-# JSX Elements
+# Elements
 
-Here is a list of every JSX element discord-jsx-renderer supports.
+Here is a list of every JSX element `discord-jsx-renderer` supports.
 
 [[toc]]
 
@@ -8,16 +8,12 @@ Here is a list of every JSX element discord-jsx-renderer supports.
 
 ## Root Elements
 
-### message
+### `message`
 
-| prop       | type      | description          |
-|------------|-----------|----------------------|
-| ephemeral? | `boolean` | Make reply ephemeral |
-| v2?        | `boolean` | Use Components v2    |
-
-Children can be;
-- If not `v2`: text content
-- If `v2`: 
+| prop       | type      | description            |
+|------------|-----------|------------------------|
+| ephemeral? | `boolean` | Make reply ephemeral   |
+| v1?        | `boolean` | Dont Use Components v2 |
 
 ```jsx
 <message>
@@ -32,11 +28,19 @@ Children can be;
 </message>
 ```
 
+### `modal`
+
+| prop      | type           | description          |
+|-----------|----------------|----------------------|
+| title     | `string`       | Title of the modal   |
+| customId? | `string`       | Optional customId    |
+| onSubmit? | `EventHandler` | Submit event handler |
+
 ---
 
 ## Layout Elements
 
-### container
+### `container`
 
 | prop     | type                | description            |
 |----------|---------------------|------------------------|
@@ -51,7 +55,7 @@ Children can be (up to 10 max):
 - [`<separator>`](#separator)
 - [`<file>`](#file)
 
-### row
+### `row`
 
 Action Row component
 
@@ -60,7 +64,7 @@ Children can be:
 - a single [`<select>`](#select)
 - a single [`<textInput>`](#button) (only if inside `<modal>`)
 
-### section
+### `section`
 
 ```tsx
 <section>
@@ -97,7 +101,7 @@ Children can also have:
 
 ## Interactive Elements
 
-### button
+### `button`
 
 Children will become button **label**
 
@@ -110,7 +114,7 @@ Children will become button **label**
 | skuId?    | `string`                                            | if specified, will become a premium button |
 | customId? | `string`                                            | experimental                               |
 
-### select
+### `select`
 
 Children are not allowed
 
@@ -132,18 +136,18 @@ Children are not allowed
 
 ## Content Elements
 
-### text
+### `text`
 
 Children will become text content.
 
-### separator
+### `separator`
 
 | prop     | type           | description |
 |----------|----------------|-------------|
 | divider? | `boolean`      |             |
 | spacing? | `"sm" \| "lg"` |             |
 
-### thumbnail
+### `thumbnail`
 
 | prop         | type      | description |
 |--------------|-----------|-------------|
@@ -151,13 +155,13 @@ Children will become text content.
 | spoiler?     | `boolean` |             |
 | media?       | `string`  | url         |
 
-### gallery
+### `gallery`
 
 | prop   | type                        | description   |
 |--------|-----------------------------|---------------|
 | items? | [`APIMediaGalleryItem`]`[]` | gallery items |
 
-### file
+### `file`
 
 | prop     | type      | description               |
 |----------|-----------|---------------------------|
@@ -165,12 +169,12 @@ Children will become text content.
 | spoiler? | `boolean` |                           |
 
 
-[`ButtonInteraction`]: https://discord.js.org/docs/packages/discord.js/14.19.1/ButtonInteraction:Class
-[`ColorResolvable`]: https://discord.js.org/docs/packages/discord.js/14.19.1/ColorResolvable:TypeAlias
-[`APISelectMenuOption`]: https://discord.js.org/docs/packages/discord.js/14.19.1/APISelectMenuOption:Interface
-[`Snowflake`]: https://discord.js.org/docs/packages/discord.js/14.19.1/Snowflake:TypeAlias
-[`Snowflake`]: https://discord.js.org/docs/packages/discord.js/14.19.1/Snowflake:TypeAlias
-[`AnySelectMenuInteraction`]: https://discord.js.org/docs/packages/discord.js/14.19.1/AnySelectMenuInteraction:TypeAlias
-[`ChannelType`]: https://discord.js.org/docs/packages/discord.js/14.19.1/ChannelType:Enum
-[`APIMediaGalleryItem`]: https://discord.js.org/docs/packages/discord.js/14.19.1/APIMediaGalleryItem:Interface
+[`ButtonInteraction`]: https://discord.js.org/docs/packages/discord.js/14.23.2/ButtonInteraction:Class
+[`ColorResolvable`]: https://discord.js.org/docs/packages/discord.js/14.23.2/ColorResolvable:TypeAlias
+[`APISelectMenuOption`]: https://discord.js.org/docs/packages/discord.js/14.23.2/APISelectMenuOption:Interface
+[`Snowflake`]: https://discord.js.org/docs/packages/discord.js/14.23.2/Snowflake:TypeAlias
+[`Snowflake`]: https://discord.js.org/docs/packages/discord.js/14.23.2/Snowflake:TypeAlias
+[`AnySelectMenuInteraction`]: https://discord.js.org/docs/packages/discord.js/14.23.2/AnySelectMenuInteraction:TypeAlias
+[`ChannelType`]: https://discord.js.org/docs/packages/discord.js/14.23.2/ChannelType:Enum
+[`APIMediaGalleryItem`]: https://discord.js.org/docs/packages/discord.js/14.23.2/APIMediaGalleryItem:Interface
 
