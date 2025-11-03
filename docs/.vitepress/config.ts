@@ -15,35 +15,31 @@ export default defineConfig({
 		sidebar: [
 			{
 				text: 'Getting Started',
-				base: "guide",
 				items: [
-					{ text: 'Installation', link: '/installation' },
-					{ text: 'TypeScript', link: '/typescript' },
-					{ text: "Rendering Elements", link: '/rendering' },
-					{ text: "Event Handlers", link: '/event-handlers' },
+					{ text: 'Installation', link: '/guide/installation' },
+					{ text: 'TypeScript', link: '/guide/typescript' },
+					{ text: "Rendering Elements", link: '/guide/rendering' },
+					{ text: "Event Handlers", link: '/guide/event-handlers' },
 				]
 			},
 			{
-				text: 'Guide',
-				base: "guide",
+				text: 'Examples',
 				items: [
-					{ text: "Rendering a Message", link: '/message' },
-					{ text: "Counter", link: '/counter' },
+					{ text: "Counter", link: '/example/counter' },
 				]
 			},
 			{
-				text: 'Features',
-				base: "features",
+				text: 'Advanced',
 				items: [
-					{ text: "Error Handling", link: '/error-handling' },
-					{ text: "Auto-defer", link: '/auto-defer' },
+					{ text: "Error Handling", link: '/advanced/error-handling' },
+					{ text: "Auto-defer", link: '/advanced/auto-defer' },
+					{ text: "Custom IDs", link: '/advanced/custom-id' },
 				]
 			},
 			{
-				base: "reference",
 				text: "Reference",
 				items: [
-					{ text: "All Elements", link: "/elements" }
+					{ text: "All Elements", link: "/reference/elements" }
 				],
 			},
 		],

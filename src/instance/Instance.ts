@@ -2,10 +2,12 @@ import { type AttachmentPayload } from "discord.js";
 import { createRoot, Root, type InternalNode } from "../reconciler/index.js";
 import { PayloadBuilder, PayloadBuilderHooks } from "../payload/PayloadBuilder.js";
 import { resolveFile } from "../utils/resolve.js";
-import { createErrorPayload } from "../utils/error.js";
-import { MessageUpdater } from "../internals.js";
+import { CreateErrorPayload, createErrorPayload } from "../utils/error.js";
+import { MessageUpdateData, MessageUpdater } from "../internals.js";
 
-export interface InstanceHooks extends Omit<PayloadBuilderHooks, "addAttachment"> { };
+export interface InstanceHooks extends Omit<PayloadBuilderHooks, "addAttachment"> {
+    createErrorPayload?: CreateErrorPayload | null;
+};
 
 export class Instance {
     root: Root;
@@ -55,8 +57,9 @@ export class Instance {
 
     private reportError(error: Error, info?: React.ErrorInfo) {
         console.error(error, info);
-        const createPayload = createErrorPayload;
+        const createPayload = this.hooks.createErrorPayload ?? createErrorPayload;
         const payload = createPayload(error, info);
+        if (!payload) return;
         this.updater.update(payload, true);
     }
 

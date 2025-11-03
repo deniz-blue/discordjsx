@@ -6,15 +6,26 @@ import { renderOnce } from "../reconciler/root.js";
 import { createElement } from "react";
 import { Wrapper, WrapperProps } from "./wrapper.js";
 import { MessageUpdateable } from "../updater/update-target.js";
+import { createErrorPayload, CreateErrorPayload } from "../internals.js";
 
 export type ModalTarget =
     | CommandInteraction
     | MessageComponentInteraction
 
+export type CreateCustomId = (instanceId: string, providedId?: string) => string;
+export const defaultCreateCustomId: CreateCustomId = (instanceId, providedId) => {
+    return `djsx::${instanceId}::${providedId || Math.random().toString(36)}`;
+};
+
 export class DiscordJSX {
     private instances: Collection<Snowflake, Instance> = new Collection();
     private listeners: Collection<string, Function> = new Collection();
     private instanceCustomIds: Collection<Snowflake, Set<string>> = new Collection();
+
+
+    public createErrorPayload: CreateErrorPayload | null = createErrorPayload;
+    public createCustomId: CreateCustomId = defaultCreateCustomId;
+
 
     // TODO
     private add = (customId: string, listener: Function) => {
@@ -26,22 +37,15 @@ export class DiscordJSX {
         addSelectEventListener: this.add,
     };
 
-    // TODO: allow customization
-    private createCustomId = (instanceId: string, providedId?: string) => {
-        const customId = `djsx::${instanceId}::${providedId || Math.random().toString(36)}`;
-        this.instanceCustomIds.get(instanceId)?.add(customId);
-        return customId;
-    }
-
     private blobFilenameCache = new WeakMap<Blob, string>();
     private getBlobFilename = (blob: Blob) => {
-        if(this.blobFilenameCache.has(blob)) return this.blobFilenameCache.get(blob)!;
+        if (this.blobFilenameCache.has(blob)) return this.blobFilenameCache.get(blob)!;
         const name = Math.random().toString(36).slice(2);
         this.blobFilenameCache.set(blob, name);
         return name;
     }
 
-    createMessage(
+    public createMessage(
         target: MessageUpdateable,
         element: React.ReactNode,
     ) {
@@ -50,9 +54,13 @@ export class DiscordJSX {
 
         const hooks: InstanceHooks = {
             ...this.eventHooks,
-            createCustomId: (providedId) =>
-                this.createCustomId(instanceId, providedId),
+            createErrorPayload: this.createErrorPayload,
             getBlobFilename: this.getBlobFilename,
+            createCustomId: (providedId) => {
+                const customId = this.createCustomId(instanceId, providedId);
+                this.instanceCustomIds.get(instanceId)?.add(customId);
+                return customId;
+            },
         };
 
         const updater = new MessageUpdater(target);
@@ -72,7 +80,7 @@ export class DiscordJSX {
         return instanceId;
     }
 
-    async createModal(
+    public async createModal(
         target: ModalTarget,
         element: React.ReactNode,
         instanceId = SnowflakeUtil.generate().toString(),
@@ -93,7 +101,7 @@ export class DiscordJSX {
         return instanceId;
     }
 
-    dispatchInteraction(int: Interaction) {
+    public dispatchInteraction(int: Interaction) {
         if (int.isMessageComponent() || int.isModalSubmit()) {
             const instanceId = this.instanceCustomIds.findKey(ids => ids.has(int.customId));
             if (instanceId) this.instances.get(instanceId)?.updater.setTarget(int);

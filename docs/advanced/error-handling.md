@@ -14,3 +14,19 @@ React rendering errors will also include the relevant component stack.
 There is also a third type of error, **error reporting error**, which means there was an error while `discord-jsx-renderer` was trying to display a previous error.
 
 All three types of errors will be logged in the console.
+
+## Customizing Error Messages
+
+To customize the default error message, you need to provide your own function that returns a message payload.
+
+```ts
+import { djsx } from "discord-jsx-renderer";
+
+djsx.createErrorPayload = (err: Error, info?: React.ErrorInfo) => {
+    // ...
+}
+```
+
+## Dont report errors
+
+`return false` inside `createErrorPayload`

@@ -10,6 +10,8 @@ const prettifyStack = (stack: string) => {
     ).join("\n");
 };
 
+export type CreateErrorPayload = (error: Error, info?: React.ErrorInfo) => MessageUpdateData | false;
+
 export const createErrorPayload = (
     error: Error,
     info?: React.ErrorInfo,

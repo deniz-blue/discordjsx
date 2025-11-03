@@ -19,10 +19,13 @@ features:
     title: React-based
     details: Supports all React features
   - title: Components V2
-    icon: 🆕
-    details: Supports all new message components
-  - title: Good UX
     icon: 💬
-    details: We handle edge cases!
+    details: Supports all new message components
+  - title: Modals
+    icon: ❗
+    details: Supports modals (with selects and file uploads!)
+  - title: Customizable
+    icon: 🛠️
+    details: Use internals depending on your needs
 ---
 
