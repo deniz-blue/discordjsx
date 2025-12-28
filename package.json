@@ -1,7 +1,8 @@
 {
   "name": "discord-jsx-renderer",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "React for discord.js",
+  "author": "deniz.blue <deniz@deniz.blue>",
   "type": "module",
   "exports": "./dist/index.js",
   "main": "dist/index.js",
@@ -24,21 +25,21 @@
   "devDependencies": {
     "@types/mime-types": "^2.1.4",
     "@types/react": "npm:pure-react-types@^0.1.4",
-    "@types/react-reconciler": "^0.32.2",
+    "@types/react-reconciler": "^0.32.3",
     "@types/uuid": "^10.0.0",
     "dotenv": "^16.6.1",
-    "typedoc": "^0.28.14",
+    "typedoc": "^0.28.15",
     "typedoc-plugin-markdown": "^4.9.0",
     "typescript": "5.8.3",
     "vitepress": "^1.6.4",
-    "vitepress-plugin-group-icons": "^1.6.4"
+    "vitepress-plugin-group-icons": "^1.6.5"
   },
   "peerDependencies": {
     "discord.js": "^14.23.2",
     "react": "^19.1.0"
   },
   "dependencies": {
-    "mime-types": "^3.0.1",
+    "mime-types": "^3.0.2",
     "nanoevents": "^9.1.0",
     "react-reconciler": "^0.32.0",
     "uuid": "^11.1.0"
@@ -50,7 +51,6 @@
     "components",
     "renderer"
   ],
-  "author": "Gökçe Deniz null <gokcedenizblue@gmail.com>",
   "license": "GPL-3.0-only",
   "bugs": {
     "url": "https://github.com/TheAlan404/discordjsx/issues"
@@ -68,10 +68,11 @@
       "ignoreMissing": [
         "@algolia/client-search",
         "search-insights"
-      ]
-    },
-    "patchedDependencies": {
-      "@types/react-reconciler": "patches/@types__react-reconciler.patch"
+      ],
+      "allowedVersions": {
+        "@docsearch/react>react": "*",
+        "@docsearch/react>@types/react": "*"
+      }
     }
   }
 }
