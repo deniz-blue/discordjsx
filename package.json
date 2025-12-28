@@ -1,6 +1,6 @@
 {
   "name": "discord-jsx-renderer",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "React for discord.js",
   "type": "module",
   "exports": "./dist/index.js",

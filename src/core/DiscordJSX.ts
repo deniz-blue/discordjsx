@@ -3,7 +3,7 @@ import { Instance, InstanceHooks } from "../instance/Instance.js";
 import { MessageUpdater } from "../updater/MessageUpdater.js";
 import { InteractionEventHooks, PayloadBuilder, PayloadBuilderHooks } from "../payload/PayloadBuilder.js";
 import { renderOnce } from "../reconciler/root.js";
-import { createElement } from "react";
+import { createElement, PropsWithChildren } from "react";
 import { Wrapper, WrapperProps } from "./wrapper.js";
 import { MessageUpdateable } from "../updater/update-target.js";
 import { createErrorPayload, CreateErrorPayload } from "../internals.js";
@@ -45,6 +45,11 @@ export class DiscordJSX {
         return name;
     }
 
+    private customWrapperComponent: React.ComponentType<PropsWithChildren> | null = null;
+    public setCustomWrapper(component: React.ComponentType<PropsWithChildren> | null) {
+        this.customWrapperComponent = component;
+    }
+
     public createMessage(
         target: MessageUpdateable,
         element: React.ReactNode,
@@ -68,6 +73,7 @@ export class DiscordJSX {
         this.instances.set(instanceId, instance);
 
         const props: WrapperProps = {
+            customWrapper: this.customWrapperComponent,
             context: {
                 instanceId,
                 instance,

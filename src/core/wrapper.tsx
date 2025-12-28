@@ -1,11 +1,15 @@
 import type { PropsWithChildren } from "react";
-import { InstanceContext } from "./context.js";
+import { InternalContext } from "./context.js";
 
 // @jsxRuntime automatic
 
 export interface WrapperProps extends PropsWithChildren {
-    context: InstanceContext;
-    customWrapper?: React.ComponentType<any>;
+    context: InternalContext;
+    customWrapper?: React.ComponentType<PropsWithChildren> | null;
+};
+
+const NoOpWrapper: React.ComponentType<PropsWithChildren> = ({ children }) => {
+    return <>{children}</>;
 };
 
 export const Wrapper = ({
@@ -13,13 +17,13 @@ export const Wrapper = ({
     children,
     customWrapper,
 }: WrapperProps) => {
-    const InnerWrapper: React.ComponentType<any> = customWrapper || (({ children }) => children);
+    const InnerWrapper: React.ComponentType<PropsWithChildren> = customWrapper || NoOpWrapper;
 
     return (
-        <InstanceContext value={context}>
+        <InternalContext value={context}>
             <InnerWrapper>
                 {children}
             </InnerWrapper>
-        </InstanceContext>
+        </InternalContext>
     );
 };

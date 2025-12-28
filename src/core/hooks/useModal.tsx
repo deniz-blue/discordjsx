@@ -1,10 +1,10 @@
 import { useCallback } from "react";
-import { useInstance } from "../context.js";
+import { useInternal } from "../context.js";
 import { djsx } from "../DiscordJSX.js";
 import { BaseInteraction } from "discord.js";
 
 export const useModal = () => {
-    const { instanceId, instance } = useInstance();
+    const { instanceId, instance } = useInternal();
 
     const open = useCallback((element: React.ReactNode) => {
         const target = instance.updater.getTarget();
