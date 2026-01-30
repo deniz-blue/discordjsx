@@ -14,7 +14,7 @@ export type ModalTarget =
 
 export type CreateCustomId = (instanceId: string, providedId?: string) => string;
 export const defaultCreateCustomId: CreateCustomId = (instanceId, providedId) => {
-    return `djsx::${instanceId}::${providedId || Math.random().toString(36)}`;
+    return `djsx::${instanceId}::${providedId || Math.random().toString(36).slice(2)}`;
 };
 
 export class DiscordJSX {

@@ -1,78 +1,86 @@
 {
-  "name": "discord-jsx-renderer",
-  "version": "0.0.14",
-  "description": "React for discord.js",
-  "author": "deniz.blue <deniz@deniz.blue>",
-  "type": "module",
-  "exports": "./dist/index.js",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "/dist"
-  ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prebuild": "node -p \"'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
-    "build": "tsc",
-    "publish:lib": "npm run build && npm publish",
-    "publish:beta": "npm run build && npm publish --tag beta",
-    "publish:dryrun": "npm run build && npm publish --dry-run",
-    "docs:typedoc": "typedoc",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
-  },
-  "devDependencies": {
-    "@types/mime-types": "^2.1.4",
-    "@types/react": "npm:pure-react-types@^0.1.4",
-    "@types/react-reconciler": "^0.32.3",
-    "@types/uuid": "^10.0.0",
-    "dotenv": "^16.6.1",
-    "typedoc": "^0.28.15",
-    "typedoc-plugin-markdown": "^4.9.0",
-    "typescript": "5.8.3",
-    "vitepress": "^1.6.4",
-    "vitepress-plugin-group-icons": "^1.6.5"
-  },
-  "peerDependencies": {
-    "discord.js": "^14.23.2",
-    "react": "^19.1.0"
-  },
-  "dependencies": {
-    "mime-types": "^3.0.2",
-    "nanoevents": "^9.1.0",
-    "react-reconciler": "^0.32.0",
-    "uuid": "^11.1.0"
-  },
-  "keywords": [
-    "react",
-    "jsx",
-    "discord.js",
-    "components",
-    "renderer"
-  ],
-  "license": "GPL-3.0-only",
-  "bugs": {
-    "url": "https://github.com/TheAlan404/discordjsx/issues"
-  },
-  "homepage": "https://github.com/TheAlan404/discordjsx#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/deniz-blue/discordjsx.git"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@algolia/client-search",
-        "search-insights"
-      ],
-      "allowedVersions": {
-        "@docsearch/react>react": "*",
-        "@docsearch/react>@types/react": "*"
-      }
-    }
-  }
+	"name": "discord-jsx-renderer",
+	"version": "0.0.14-a",
+	"description": "React for discord.js",
+	"author": "deniz.blue <deniz@deniz.blue>",
+	"type": "module",
+	"files": [
+		"/dist"
+	],
+	"exports": {
+		".": "./src/index.ts",
+		"./internals": "./src/internals.ts"
+	},
+	"publishConfig": {
+		"main": "./dist/index.js",
+		"types": "./dist/index.d.ts",
+		"exports": {
+			".": "./dist/index.js",
+			"./internals": "./dist/internals.js"
+		}
+	},
+	"scripts": {
+		"prebuild": "node -p \"'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
+		"build": "tsc",
+		"publish:lib": "npm run build && npm publish",
+		"publish:beta": "npm run build && npm publish --tag beta",
+		"publish:dryrun": "npm run build && npm publish --dry-run",
+		"docs:typedoc": "typedoc",
+		"docs:dev": "vitepress dev docs",
+		"docs:build": "vitepress build docs",
+		"docs:preview": "vitepress preview docs"
+	},
+	"devDependencies": {
+		"@types/mime-types": "^2.1.4",
+		"@types/react": "npm:pure-react-types@^0.1.4",
+		"@types/react-reconciler": "^0.32.3",
+		"@types/uuid": "^10.0.0",
+		"dotenv": "^16.6.1",
+		"typedoc": "^0.28.15",
+		"typedoc-plugin-markdown": "^4.9.0",
+		"typescript": "5.8.3",
+		"vitepress": "^1.6.4",
+		"vitepress-plugin-group-icons": "^1.6.5"
+	},
+	"peerDependencies": {
+		"discord.js": "^14.23.2",
+		"react": "^19.1.0"
+	},
+	"dependencies": {
+		"mime-types": "^3.0.2",
+		"nanoevents": "^9.1.0",
+		"react-reconciler": "^0.32.0",
+		"uuid": "^11.1.0"
+	},
+	"keywords": [
+		"react",
+		"jsx",
+		"discord.js",
+		"components",
+		"renderer"
+	],
+	"license": "GPL-3.0-only",
+	"bugs": {
+		"url": "https://github.com/deniz-blue/discordjsx/issues"
+	},
+	"homepage": "https://djsx.deniz.blue/",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/deniz-blue/discordjsx.git"
+	},
+	"engines": {
+		"node": ">=18"
+	},
+	"pnpm": {
+		"peerDependencyRules": {
+			"ignoreMissing": [
+				"@algolia/client-search",
+				"search-insights"
+			],
+			"allowedVersions": {
+				"@docsearch/react>react": "*",
+				"@docsearch/react>@types/react": "*"
+			}
+		}
+	}
 }

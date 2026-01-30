@@ -70,10 +70,16 @@ export class PayloadBuilder {
         if (node.props.onSubmit)
             hooks.addModalSubmitEventListener(customId, node.props.onSubmit);
 
+		let nextId = 0;
+		const hooksStableCustomIds: PayloadBuilderHooks = {
+			...hooks,
+			createCustomId: (providedId?: string) => providedId || `${nextId++}`,
+		};
+
         return {
             title: node.props.title,
             custom_id: customId,
-            components: node.children.map(child => this.asComponent(child, hooks)),
+            components: node.children.map(child => this.asComponent(child, hooksStableCustomIds)),
         } satisfies APIModalInteractionResponseCallbackData;
     }
 

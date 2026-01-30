@@ -3,46 +3,53 @@ import { BaseChannel, BaseInteraction, BaseMessageOptions, ButtonInteraction, Ch
 export const INTERACTION_TOKEN_EXPIRY = 15 * 60 * 1000;
 export const INTERACTION_REPLY_EXPIRY = 3 * 1000;
 
+export type MessageUpdateableInteraction =
+	| ChatInputCommandInteraction
+	| ButtonInteraction
+	| StringSelectMenuInteraction
+	| UserSelectMenuInteraction
+	| RoleSelectMenuInteraction
+	| MentionableSelectMenuInteraction
+	| ChannelSelectMenuInteraction
+	| ModalSubmitInteraction;
+
 export type MessageUpdateable =
-    | ChatInputCommandInteraction
-    | ButtonInteraction
-    | StringSelectMenuInteraction
-    | UserSelectMenuInteraction
-    | RoleSelectMenuInteraction
-    | MentionableSelectMenuInteraction
-    | ChannelSelectMenuInteraction
-    | ModalSubmitInteraction
-    | (BaseChannel & TextBasedChannel & SendableChannels)
-    | Message
-    | User;
+	| MessageUpdateableInteraction
+	| (BaseChannel & TextBasedChannel & SendableChannels)
+	| Message
+	| User;
+
+export const isMessageUpdateableInteraction = (target: MessageUpdateable): target is MessageUpdateableInteraction => {
+	return target instanceof BaseInteraction;
+};
 
 export const getTargetExpiration = (target: MessageUpdateable): number | null => {
-    if (target instanceof BaseInteraction) return INTERACTION_TOKEN_EXPIRY;
+	if (isMessageUpdateableInteraction(target)) return INTERACTION_TOKEN_EXPIRY;
 
-    return null;
+	return null;
 };
 
 export const getTargetResponseDeadline = (target: MessageUpdateable) => {
-    if (target instanceof BaseInteraction) {
-        if (!target.replied && !target.deferred) return INTERACTION_REPLY_EXPIRY;
-    }
-    return null;
+	if (isMessageUpdateableInteraction(target)) {
+		if (!target.replied && !target.deferred) return INTERACTION_REPLY_EXPIRY;
+	}
+	return null;
 };
 
 export const deferTarget = async (target: MessageUpdateable) => {
-    if (target instanceof BaseInteraction) {
-        if (target.replied || target.deferred) return;
+	if (isMessageUpdateableInteraction(target)) {
+		if (target.replied || target.deferred) return;
 
-        if (target.isMessageComponent() || (target.isModalSubmit() && target.isFromMessage())) {
-            await target.deferUpdate();
-        } else if (target.isRepliable()) {
-            await target.deferReply();
-        }
-    }
+		if (target.isMessageComponent() || (target.isModalSubmit() && target.isFromMessage())) {
+			await target.deferUpdate();
+		} else if (target.isRepliable()) {
+			await target.deferReply();
+		}
+	}
 }
 
 export type MessageUpdateData = BaseMessageOptions & {
-    flags?: MessageFlags[];
+	flags?: MessageFlags[];
 };
 
 /**
@@ -52,76 +59,76 @@ export type MessageUpdateData = BaseMessageOptions & {
  * @returns The new target if it changed, null if the target stayed the same
  */
 export const updateTarget = async (
-    target: MessageUpdateable,
-    payload: MessageUpdateData,
+	target: MessageUpdateable,
+	payload: MessageUpdateData,
 ): Promise<MessageUpdateable | null> => {
-    const flags = payload.flags ?? [];
+	const flags = payload.flags ?? [];
 
-    if (target instanceof BaseInteraction) {
-        if (target.replied || target.deferred) {
-            await target.editReply({
-                ...payload,
-                flags: pickMessageFlags(flags, [MessageFlags.SuppressEmbeds, MessageFlags.IsComponentsV2]),
-            });
-        } else {
-            if (
-                target.isChatInputCommand()
-                || (target.isModalSubmit() && !target.isFromMessage())
-            ) {
-                await target.reply({
-                    ...payload,
-                    flags: pickMessageFlags(flags, [
-                        MessageFlags.Ephemeral,
-                        MessageFlags.SuppressEmbeds,
-                        MessageFlags.SuppressNotifications,
-                        MessageFlags.IsComponentsV2,
-                    ]),
-                });
-            } else if (
-                target.isMessageComponent()
-                || (target.isModalSubmit() && target.isFromMessage())
-            ) {
-                await target.update({
-                    ...payload,
-                    flags: pickMessageFlags(flags, [MessageFlags.SuppressEmbeds, MessageFlags.IsComponentsV2]),
-                });
-            }
-        }
-    } else if (target instanceof Message) {
-        await target.edit({
-            ...payload,
-            flags: pickMessageFlags(flags, [MessageFlags.SuppressEmbeds, MessageFlags.IsComponentsV2]),
-        });
-    } else if (target instanceof BaseChannel) {
-        // Changes target!
-        return await target.send({
-            ...payload,
-            flags: pickMessageFlags(flags, [
-                MessageFlags.SuppressEmbeds,
-                MessageFlags.SuppressNotifications,
-                MessageFlags.IsComponentsV2,
-            ]),
-        });
-    } else if (target instanceof User) {
-        // Changes target!
-        return await (await target.createDM()).send({
-            ...payload,
-            flags: pickMessageFlags(flags, [
-                MessageFlags.SuppressEmbeds,
-                MessageFlags.SuppressNotifications,
-                MessageFlags.IsComponentsV2,
-            ]),
-        });
-    }
+	if (isMessageUpdateableInteraction(target)) {
+		if (target.replied || target.deferred) {
+			await target.editReply({
+				...payload,
+				flags: pickMessageFlags(flags, [MessageFlags.SuppressEmbeds, MessageFlags.IsComponentsV2]),
+			});
+		} else {
+			if (
+				target.isChatInputCommand()
+				|| (target.isModalSubmit() && !target.isFromMessage())
+			) {
+				await target.reply({
+					...payload,
+					flags: pickMessageFlags(flags, [
+						MessageFlags.Ephemeral,
+						MessageFlags.SuppressEmbeds,
+						MessageFlags.SuppressNotifications,
+						MessageFlags.IsComponentsV2,
+					]),
+				});
+			} else if (
+				target.isMessageComponent()
+				|| (target.isModalSubmit() && target.isFromMessage())
+			) {
+				await target.update({
+					...payload,
+					flags: pickMessageFlags(flags, [MessageFlags.SuppressEmbeds, MessageFlags.IsComponentsV2]),
+				});
+			}
+		}
+	} else if (target instanceof Message) {
+		await target.edit({
+			...payload,
+			flags: pickMessageFlags(flags, [MessageFlags.SuppressEmbeds, MessageFlags.IsComponentsV2]),
+		});
+	} else if (target instanceof BaseChannel) {
+		// Changes target!
+		return await target.send({
+			...payload,
+			flags: pickMessageFlags(flags, [
+				MessageFlags.SuppressEmbeds,
+				MessageFlags.SuppressNotifications,
+				MessageFlags.IsComponentsV2,
+			]),
+		});
+	} else if (target instanceof User) {
+		// Changes target!
+		return await (await target.createDM()).send({
+			...payload,
+			flags: pickMessageFlags(flags, [
+				MessageFlags.SuppressEmbeds,
+				MessageFlags.SuppressNotifications,
+				MessageFlags.IsComponentsV2,
+			]),
+		});
+	}
 
-    // target unchanged
-    return null;
+	// target unchanged
+	return null;
 };
 
 export const pickMessageFlags = <
-    T extends number,
-    Allowed extends readonly T[],
+	T extends number,
+	Allowed extends readonly T[],
 >(flags: T[], allowedFlags: Allowed): Allowed[number][] => {
-    return flags.filter((flag): flag is Allowed[number] => allowedFlags.includes(flag));
+	return flags.filter((flag): flag is Allowed[number] => allowedFlags.includes(flag));
 };
 
