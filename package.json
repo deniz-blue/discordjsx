@@ -1,6 +1,6 @@
 {
 	"name": "discord-jsx-renderer",
-	"version": "0.0.14-a",
+	"version": "0.0.15",
 	"description": "React for discord.js",
 	"author": "deniz.blue <deniz@deniz.blue>",
 	"type": "module",
@@ -22,9 +22,9 @@
 	"scripts": {
 		"prebuild": "node -p \"'export const VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
 		"build": "tsc",
-		"publish:lib": "npm run build && npm publish",
-		"publish:beta": "npm run build && npm publish --tag beta",
-		"publish:dryrun": "npm run build && npm publish --dry-run",
+		"publish:lib": "pnpm run build && pnpm publish",
+		"publish:beta": "pnpm run build && pnpm publish --tag beta",
+		"publish:dryrun": "pnpm run build && pnpm publish --dry-run",
 		"docs:typedoc": "typedoc",
 		"docs:dev": "vitepress dev docs",
 		"docs:build": "vitepress build docs",
