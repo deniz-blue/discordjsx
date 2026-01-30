@@ -1,4 +1,4 @@
-import { BaseMessageOptions, DiscordAPIError } from "discord.js";
+import { DiscordAPIError } from "discord.js";
 import { MessageUpdateable, MessageUpdateData, updateTarget, getTargetResponseDeadline, getTargetExpiration, deferTarget } from "./update-target.js";
 import Mutex from "../utils/mutex.js";
 import { debounceAsync } from "../utils/debounceAsync.js";
