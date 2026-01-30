@@ -24,7 +24,7 @@ If you are using **TypeScript**, you should also read [TypeScript information](.
 
 ## Setup
 
-You need to call `djsx.dispatchInteraction` with any new **interaction**s to be able to use [event handlers]().
+You need to call `djsx.dispatchInteraction` with any new **interaction**s to be able to use [event handlers](./event-handlers.md).
 
 If you already have an `Client#InteractionCreate` event handler, you can call it there - otherwise, you should add a listener.
 
