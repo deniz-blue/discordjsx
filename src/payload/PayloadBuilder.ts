@@ -184,7 +184,7 @@ export class PayloadBuilder {
 
         return {
             type: ComponentType.Button,
-            custom_id: customId,
+            custom_id: node.props.url ? undefined : customId,
             label: getNodeText(node),
             style,
             sku_id: node.props.skuId,
@@ -240,7 +240,6 @@ export class PayloadBuilder {
     }
 
     static asSection(node: TypedNode, hooks: PayloadBuilderHooks) {
-        if (node.type !== "select") throw new Error("INVALID_NODE_TYPE");
         const nonAccessory = node.children.filter(x => x.type !== "accessory");
 
         const accessoryNode = node.children.find(x => x.type === "accessory")?.children[0];

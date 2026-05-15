@@ -1,5 +1,5 @@
 {
-	"name": "discord-jsx-renderer",
+	"name": "@teamfireworks/discord-jsx-renderer",
 	"version": "0.0.16",
 	"description": "React for discord.js",
 	"author": "deniz.blue <deniz@deniz.blue>",
