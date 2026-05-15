@@ -47,6 +47,7 @@ export class Instance {
         const files = await Promise.all(attachmentPromises);
 
         this.updater.update({
+            allowedMentions: node.props.allowedMentions,
             components,
             files,
             flags,

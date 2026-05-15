@@ -1,8 +1,9 @@
 import { PropsWithChildren } from "react";
 import { EventHandler } from "../events.js";
-import { ModalSubmitInteraction } from "discord.js";
+import { ModalSubmitInteraction, MessageCreateOptions } from "discord.js";
 
 export interface MessageProps extends PropsWithChildren {
+    allowedMentions?: MessageCreateOptions["allowedMentions"];
     v1?: boolean;
     ephemeral?: boolean;
 }
